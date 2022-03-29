@@ -7,9 +7,8 @@ import matplotlib.pyplot as plt
 # Columns - Profile Name, Start Time, Duration, Attributes, Title, 
 #           Supplemental Video Type, Device Type, Bookmark, Latest Bookmark, Country
 
-#Below option disables the SettingWithCopyWarning that pop up working with slicing these frames;
-#Instances are marked, though deep copy does also prevent the warning - if it were usable in all instances, could default back
-pd.options.mode.chained_assignment = None #default='warn'
+#Below option disables the SettingWithCopyWarning that pop up adding columns to copied frames; added columns to main instead
+#pd.options.mode.chained_assignment = None #default='warn'
 #file = 'ViewingActivity.csv'
 
 def analyse(file='ViewingActivity.csv'):
@@ -25,8 +24,12 @@ def analyse(file='ViewingActivity.csv'):
     df['week'] = df['Start Time'].dt.isocalendar().week
     df['month'] = df['Start Time'].dt.month
     df['year'] = df['Start Time'].dt.year
+    
+    #Categorizing for proper ordering in charts
+    dotw=['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+    df['weekday'] = pd.Categorical(df['weekday'], categories=dotw, ordered=True)
 
-    # Convert 'Duration' column from object to timedelta
+    # Convert 'Duration' column from object to timedelta to allow next trim
     df['Duration'] = pd.to_timedelta(df['Duration'])
     # Make new dataframe to trim out previews, trailers, etc.
     no_previews = df[(df['Duration'] > '0 days 00:02:30')]
@@ -45,24 +48,11 @@ def limited_analysis(limited_dataframe):
 
 def graph_by_day(by_day_dataframe):
     '''Graph provided dataset by day '''
-    #SettingWithCopyWarning
-    no_previews['weekday'] = no_previews['Start Time'].copy(deep=True).dt.day_name()
-    dotw=['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
-    #SettingWithCopyWarning
-    no_previews['weekday'] = pd.Categorical(no_previews['weekday'], categories=dotw, ordered=True)
     no_previews_by_day = no_previews['weekday'].value_counts()
     no_previews_by_day = no_previews_by_day.sort_index()
     no_previews_by_day.plot(kind='bar', figsize=(10,5), title='Anything Watched by Day (ex. Previews)')
     plt.tight_layout()
     plt.show()
-
-# Tease out some other datapoints
-'''df['weekday'] = df['Start Time'].dt.weekday
-df['hour'] = df['Start Time'].dt.hour
-df['quarter'] = df['Start Time'].dt.quarter
-df['week'] = df['Start Time'].dt.isocalendar().week
-df['month'] = df['Start Time'].dt.month
-df['month'] = df['Start Time'].dt.year'''
 
 if __name__ == "__main__":
     no_previews = analyse()
