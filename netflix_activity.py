@@ -7,6 +7,8 @@ import matplotlib.pyplot as plt
 # Columns - Profile Name, Start Time, Duration, Attributes, Title, 
 #           Supplemental Video Type, Device Type, Bookmark, Latest Bookmark, Country
 
+#Below option disables the SettingWithCopyWarning that pop up working with slicing these frames;
+#Instances are marked, though deep copy does also prevent the warning - if it were usable in all instances, could default back
 pd.options.mode.chained_assignment = None #default='warn'
 #file = 'ViewingActivity.csv'
 
@@ -17,6 +19,12 @@ def analyse(file='ViewingActivity.csv'):
     df = df.set_index('Start Time')
     df.index = df.index.tz_convert('US/Central')
     df = df.reset_index()
+    df['weekday'] = df['Start Time'].dt.day_name()
+    df['hour'] = df['Start Time'].dt.hour
+    df['quarter'] = df['Start Time'].dt.quarter
+    df['week'] = df['Start Time'].dt.isocalendar().week
+    df['month'] = df['Start Time'].dt.month
+    df['year'] = df['Start Time'].dt.year
 
     # Convert 'Duration' column from object to timedelta
     df['Duration'] = pd.to_timedelta(df['Duration'])
@@ -37,8 +45,10 @@ def limited_analysis(limited_dataframe):
 
 def graph_by_day(by_day_dataframe):
     '''Graph provided dataset by day '''
+    #SettingWithCopyWarning
     no_previews['weekday'] = no_previews['Start Time'].copy(deep=True).dt.day_name()
     dotw=['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+    #SettingWithCopyWarning
     no_previews['weekday'] = pd.Categorical(no_previews['weekday'], categories=dotw, ordered=True)
     no_previews_by_day = no_previews['weekday'].value_counts()
     no_previews_by_day = no_previews_by_day.sort_index()
@@ -47,7 +57,6 @@ def graph_by_day(by_day_dataframe):
     plt.show()
 
 # Tease out some other datapoints
-# NOTE: SettingWithCopyWarning
 '''df['weekday'] = df['Start Time'].dt.weekday
 df['hour'] = df['Start Time'].dt.hour
 df['quarter'] = df['Start Time'].dt.quarter
