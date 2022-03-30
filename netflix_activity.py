@@ -3,6 +3,8 @@
 
 import pandas as pd
 import matplotlib.pyplot as plt
+import datetime
+from matplotlib.backends.backend_pdf import PdfPages
 
 # Columns - Profile Name, Start Time, Duration, Attributes, Title, 
 #           Supplemental Video Type, Device Type, Bookmark, Latest Bookmark, Country
@@ -47,12 +49,26 @@ def limited_analysis(limited_dataframe):
     print ('The mean time watched is: {}\nThe median time watched is: {}'.format(mean_time_watched,median_time_watched))
 
 def graph_by_day(by_day_dataframe):
-    '''Graph provided dataset by day '''
-    no_previews_by_day = no_previews['weekday'].value_counts()
-    no_previews_by_day = no_previews_by_day.sort_index()
-    no_previews_by_day.plot(kind='bar', figsize=(10,5), title='Anything Watched by Day (ex. Previews)')
-    plt.tight_layout()
-    plt.show()
+    '''Graph provided dataset by day and output to PDF'''
+    with PdfPages('NetflixActivityAnalysis.pdf') as pdf:
+        no_previews_by_day = no_previews['weekday'].value_counts()
+        no_previews_by_day = no_previews_by_day.sort_index()
+        no_previews_by_day.plot(kind='bar', figsize=(10,5), title='Anything Watched by Day (ex. Previews)')
+        plt.tight_layout()
+        pdf.savefig()
+        plt.show()
+        plt.close()
+    
+        #Set PDF metadata
+        d = pdf.infodict()
+        d['Title'] = 'Netflix Activity Analysis'
+        # Will need to consider identifying user - would need to be OS agnostic
+        d['Author'] = u'Jeremiah Adams'
+        d['Subject'] = 'Stats and graphs on the user\'s supplied Netflix Activity'
+        d['Keywords'] = 'Netflix DataScience Statistics'
+        d['CreationDate'] = datetime.datetime(2022, 3, 30)
+        d['ModDate'] = datetime.datetime.today()
+    
 
 if __name__ == "__main__":
     no_previews = analyse()
