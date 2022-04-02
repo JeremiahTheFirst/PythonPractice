@@ -5,6 +5,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import datetime
 from matplotlib.backends.backend_pdf import PdfPages
+import reports
 
 # Columns - Profile Name, Start Time, Duration, Attributes, Title, 
 #           Supplemental Video Type, Device Type, Bookmark, Latest Bookmark, Country
@@ -47,6 +48,7 @@ def limited_analysis(limited_dataframe):
     median_time_watched = no_previews['Duration'].median()
     print ('The total time watched is: {}\nThe mode time watched is: {}'.format(total_time_watched,mode_time_watched))
     print ('The mean time watched is: {}\nThe median time watched is: {}'.format(mean_time_watched,median_time_watched))
+    return total_time_watched,mode_time_watched,mean_time_watched,median_time_watched
 
 def graph_by_day(by_day_dataframe):
     '''Graph provided dataset by day and output to PDF'''
@@ -69,8 +71,19 @@ def graph_by_day(by_day_dataframe):
         d['CreationDate'] = datetime.datetime(2022, 3, 30)
         d['ModDate'] = datetime.datetime.today()
     
+def generate_report(analysis):
+    rpt_txt = 'The total time watched is: {}<br />The mode time watched is: {}<br />'.format(analysis[0],analysis[1])
+    rpt_txt += 'The mean time watched is: {}<br />The median time watched is: {}<br />'.format(analysis[2],analysis[3])
+    return rpt_txt    
 
 if __name__ == "__main__":
     no_previews = analyse()
-    limited_analysis(no_previews)
+    analysis = limited_analysis(no_previews)
+    generate_report(analysis)
     graph_by_day(no_previews)
+    
+    #Report section
+    title = 'Netflix Activity Analysis'
+    filename = 'NetflixActivityAnalysis.pdf'
+    paragraph = generate_report(analysis)
+    reports.generate(filename, title, paragraph)
