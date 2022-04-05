@@ -45,7 +45,14 @@ def limited_analysis(limited_dataframe):
     total_time_watched = no_previews['Duration'].sum()
     mode_time_watched = no_previews['Duration'].mode(dropna=True)[0]
     mean_time_watched = no_previews['Duration'].mean()
+    #Ifs work for sample data, but double-digit days will break it
+    if len(str(mean_time_watched)) > 15:
+        # Convert timedelta to string and drop everything after seconds
+        mean_time_watched = str(mean_time_watched)[:-7]
     median_time_watched = no_previews['Duration'].median()
+    if len(str(median_time_watched)) > 15:
+        # Convert timedelta to string and drop everything after seconds
+        median_time_watched = str(median_time_watched)[:-7]
     print ('The total time watched is: {}\nThe mode time watched is: {}'.format(total_time_watched,mode_time_watched))
     print ('The mean time watched is: {}\nThe median time watched is: {}'.format(mean_time_watched,median_time_watched))
     return total_time_watched,mode_time_watched,mean_time_watched,median_time_watched
@@ -72,18 +79,46 @@ def graph_by_day(by_day_dataframe):
         d['ModDate'] = datetime.datetime.today()
     
 def generate_report(analysis):
-    rpt_txt = 'The total time watched is: {}<br />The mode time watched is: {}<br />'.format(analysis[0],analysis[1])
-    rpt_txt += 'The mean time watched is: {}<br />The median time watched is: {}<br />'.format(analysis[2],analysis[3])
+    rpt_txt = 'The total time watched is: {}\nThe mode time watched is: {}\n'.format(analysis[0],analysis[1])
+    rpt_txt += 'The mean time watched is: {}\nThe median time watched is: {}\n'.format(analysis[2],analysis[3])
     return rpt_txt    
+    
+def graph_change(rpt_txt):
+    '''Alternate graph method '''
+    with PdfPages('NetflixActivityAnalysis.pdf') as pdf:
+        first_page = plt.figure(figsize=(11.69,8.27))
+        first_page.clf()
+        first_page.text(0,.75,rpt_txt)
+        pdf.savefig()
+        plt.close()
+        
+        no_previews_by_day = no_previews['weekday'].value_counts()
+        no_previews_by_day = no_previews_by_day.sort_index()
+        no_previews_by_day.plot(kind='bar', figsize=(10,5), title='Anything Watched by Day (ex. Previews)')
+        plt.tight_layout()
+        pdf.savefig()
+        #plt.show()
+        plt.close()
+        
+        #Set PDF metadata
+        d = pdf.infodict()
+        d['Title'] ='Netflix Activity Analysis'
+        # Will need to consider identifying user - would need to be OS agnostic
+        d['Author'] = 'Jeremiah Adams'
+        d['Subject'] = 'Stats and graphs on the user\'s supplied Netflix Activity'
+        d['Keywords'] = 'Netflix DataScience Statistics'
+        d['CreationDate'] = datetime.datetime(2022, 3, 30)
+        d['ModDate'] = datetime.datetime.today()
 
 if __name__ == "__main__":
     no_previews = analyse()
     analysis = limited_analysis(no_previews)
-    generate_report(analysis)
-    graph_by_day(no_previews)
+    rpt_txt = generate_report(analysis)
+    graph_change(rpt_txt)
+    #graph_by_day(no_previews)
     
     #Report section
-    title = 'Netflix Activity Analysis'
-    filename = 'NetflixActivityAnalysis.pdf'
-    paragraph = generate_report(analysis)
-    reports.generate(filename, title, paragraph)
+    #title = 'Netflix Activity Analysis'
+    #filename = 'NetflixActivityAnalysis.pdf'
+    #paragraph = generate_report(analysis)
+    #reports.generate(filename, title, paragraph)
