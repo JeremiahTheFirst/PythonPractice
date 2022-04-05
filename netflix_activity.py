@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import datetime
 from matplotlib.backends.backend_pdf import PdfPages
 import reports
+import time_breakdown
 
 # Columns - Profile Name, Start Time, Duration, Attributes, Title, 
 #           Supplemental Video Type, Device Type, Bookmark, Latest Bookmark, Country
@@ -45,14 +46,10 @@ def limited_analysis(limited_dataframe):
     total_time_watched = no_previews['Duration'].sum()
     mode_time_watched = no_previews['Duration'].mode(dropna=True)[0]
     mean_time_watched = no_previews['Duration'].mean()
-    #Ifs work for sample data, but double-digit days will break it
-    if len(str(mean_time_watched)) > 15:
-        # Convert timedelta to string and drop everything after seconds
-        mean_time_watched = str(mean_time_watched)[:-7]
     median_time_watched = no_previews['Duration'].median()
-    if len(str(median_time_watched)) > 15:
-        # Convert timedelta to string and drop everything after seconds
-        median_time_watched = str(median_time_watched)[:-7]
+    mode_time_watched = time_breakdown.split(mode_time_watched)
+    mean_time_watched = time_breakdown.split(mean_time_watched)
+    median_time_watched = time_breakdown.split(median_time_watched)
     print ('The total time watched is: {}\nThe mode time watched is: {}'.format(total_time_watched,mode_time_watched))
     print ('The mean time watched is: {}\nThe median time watched is: {}'.format(mean_time_watched,median_time_watched))
     return total_time_watched,mode_time_watched,mean_time_watched,median_time_watched
