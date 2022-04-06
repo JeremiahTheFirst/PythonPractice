@@ -76,8 +76,8 @@ def graph_by_day(by_day_dataframe):
         d['ModDate'] = datetime.datetime.today()
     
 def generate_report(analysis):
-    rpt_txt = 'The total time watched is: {}\nThe mode time watched is: {}\n'.format(analysis[0],analysis[1])
-    rpt_txt += 'The mean time watched is: {}\nThe median time watched is: {}\n'.format(analysis[2],analysis[3])
+    rpt_txt = 'The total time watched is:        {}\nThe mode time watched is:      {}\n'.format(analysis[0],analysis[1])
+    rpt_txt += 'The mean time watched is:      {}\nThe median time watched is:   {}\n'.format(analysis[2],analysis[3])
     return rpt_txt    
     
 def graph_change(rpt_txt):
@@ -85,7 +85,9 @@ def graph_change(rpt_txt):
     with PdfPages('NetflixActivityAnalysis.pdf') as pdf:
         first_page = plt.figure(figsize=(11.69,8.27))
         first_page.clf()
-        first_page.text(0,.75,rpt_txt)
+        title = 'Netflix Activity Analysis'
+        first_page.text(0.5,.9,title,fontsize=24, ha='center')
+        first_page.text(0.1,.75,rpt_txt)
         pdf.savefig()
         plt.close()
         
