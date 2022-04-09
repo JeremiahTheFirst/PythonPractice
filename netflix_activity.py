@@ -56,24 +56,19 @@ def limited_analysis(limited_dataframe):
 
 def graph_by_day(by_day_dataframe):
     '''Graph provided dataset by day and output to PDF'''
-    with PdfPages('NetflixActivityAnalysis.pdf') as pdf:
-        no_previews_by_day = no_previews['weekday'].value_counts()
-        no_previews_by_day = no_previews_by_day.sort_index()
-        no_previews_by_day.plot(kind='bar', figsize=(10,5), title='Anything Watched by Day (ex. Previews)')
-        plt.tight_layout()
-        pdf.savefig()
-        plt.show()
-        plt.close()
-    
-        #Set PDF metadata
-        d = pdf.infodict()
-        d['Title'] = 'Netflix Activity Analysis'
-        # Will need to consider identifying user - would need to be OS agnostic
-        d['Author'] = u'Jeremiah Adams'
-        d['Subject'] = 'Stats and graphs on the user\'s supplied Netflix Activity'
-        d['Keywords'] = 'Netflix DataScience Statistics'
-        d['CreationDate'] = datetime.datetime(2022, 3, 30)
-        d['ModDate'] = datetime.datetime.today()
+    no_previews_by_day = no_previews['weekday'].value_counts()
+    no_previews_by_day = no_previews_by_day.sort_index()
+    graph_result = no_previews_by_day.plot(kind='bar', figsize=(10,5), title='Anything Watched by Day (ex. Previews)')
+    #plt.tight_layout()
+    #plt.show()
+    #plt.close()
+    return graph_result
+
+def graph_test(graph_result):
+    graph_result.plot()
+    plt.tight_layout()
+    plt.show()
+    plt.close()
     
 def generate_report(analysis):
     rpt_txt = 'The total time watched is:        {}\nThe mode time watched is:      {}\n'.format(analysis[0],analysis[1])
@@ -113,8 +108,9 @@ if __name__ == "__main__":
     no_previews = analyse()
     analysis = limited_analysis(no_previews)
     rpt_txt = generate_report(analysis)
-    graph_change(rpt_txt)
-    #graph_by_day(no_previews)
+    #graph_change(rpt_txt)
+    graph_result = graph_by_day(no_previews)
+    graph_test(graph_result)
     
     #Report section
     #title = 'Netflix Activity Analysis'
