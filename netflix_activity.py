@@ -80,8 +80,8 @@ def graph_change(rpt_txt):
     with PdfPages('NetflixActivityAnalysis.pdf') as pdf:
         first_page = plt.figure(figsize=(11.69,8.27))
         first_page.clf()
-        title = 'Netflix Activity Analysis'
-        first_page.text(0.5,.9,title,fontsize=24, ha='center')
+        rpt_title = 'Netflix Activity Analysis'
+        first_page.text(0.5,.9,rpt_title,fontsize=24, ha='center')
         first_page.text(0.1,.75,rpt_txt)
         pdf.savefig()
         plt.close()
@@ -103,14 +103,14 @@ def graph_change(rpt_txt):
         d['Keywords'] = 'Netflix DataScience Statistics'
         d['CreationDate'] = datetime.datetime(2022, 3, 30)
         d['ModDate'] = datetime.datetime.today()
-
+        
 if __name__ == "__main__":
     limited_dataframe = analyse()
     analysis = limited_analysis(limited_dataframe)
     rpt_txt = generate_report(analysis)
     #graph_change(rpt_txt)
     graph_plots = graphs.graphnalysis(limited_dataframe,'Anything Watched by Day (ex. Previews)')
-    graphs.graph_result(graph_plots)
+    graphs.graph_result(rpt_txt,graph_plots)
     
     #Report section
     #title = 'Netflix Activity Analysis'
