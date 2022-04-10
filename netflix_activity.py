@@ -5,7 +5,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import datetime
 from matplotlib.backends.backend_pdf import PdfPages
-import reports
+import graphs
 import time_breakdown
 
 # Columns - Profile Name, Start Time, Duration, Attributes, Title, 
@@ -43,10 +43,10 @@ def limited_analysis(limited_dataframe):
     '''Gets datapoints from the more limited sample provided '''
 
     # Calculate some interesting points
-    total_time_watched = no_previews['Duration'].sum()
-    mode_time_watched = no_previews['Duration'].mode(dropna=True)[0]
-    mean_time_watched = no_previews['Duration'].mean()
-    median_time_watched = no_previews['Duration'].median()
+    total_time_watched = limited_dataframe['Duration'].sum()
+    mode_time_watched = limited_dataframe['Duration'].mode(dropna=True)[0]
+    mean_time_watched = limited_dataframe['Duration'].mean()
+    median_time_watched = limited_dataframe['Duration'].median()
     mode_time_watched = time_breakdown.split(mode_time_watched)
     mean_time_watched = time_breakdown.split(mean_time_watched)
     median_time_watched = time_breakdown.split(median_time_watched)
@@ -105,15 +105,14 @@ def graph_change(rpt_txt):
         d['ModDate'] = datetime.datetime.today()
 
 if __name__ == "__main__":
-    no_previews = analyse()
-    analysis = limited_analysis(no_previews)
+    limited_dataframe = analyse()
+    analysis = limited_analysis(limited_dataframe)
     rpt_txt = generate_report(analysis)
     #graph_change(rpt_txt)
-    graph_result = graph_by_day(no_previews)
-    graph_test(graph_result)
+    graph_plots = graphs.graphnalysis(limited_dataframe,'Anything Watched by Day (ex. Previews)')
+    graphs.graph_result(graph_plots)
     
     #Report section
     #title = 'Netflix Activity Analysis'
     #filename = 'NetflixActivityAnalysis.pdf'
     #paragraph = generate_report(analysis)
-    #reports.generate(filename, title, paragraph)
