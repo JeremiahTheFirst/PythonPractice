@@ -43,6 +43,12 @@ def limited_analysis(limited_dataframe):
     '''Gets datapoints from the more limited sample provided '''
 
     # Calculate some interesting points
+    top5 = df['Title'].value_counts().nlargest(5).to_string(name=False,dtype=False)
+    #print top5 to return clean look
+    Season = testf['Title'].str.extract(r'^(([A-Za-z: ]+) (Season \d{1,3})(?:: ))?.*?([A-Za-z: ].*)?')
+    testc = pd.concat([testf,Season],axis=1)
+    testc.drop(['Title'], axis=1, inplace=True)
+    #Don't want to do above just yet, but how it would be done
     total_time_watched = limited_dataframe['Duration'].sum()
     mode_time_watched = limited_dataframe['Duration'].mode(dropna=True)[0]
     mean_time_watched = limited_dataframe['Duration'].mean()
