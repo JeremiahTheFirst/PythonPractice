@@ -45,7 +45,16 @@ def limited_analysis(limited_dataframe):
     # Calculate some interesting points
     top5 = df['Title'].value_counts().nlargest(5).to_string(name=False,dtype=False)
     #print top5 to return clean look
-    Season = testf['Title'].str.extract(r'^(([A-Za-z: ]+) (Season \d{1,3})(?:: ))?.*?([A-Za-z: ].*)?')
+    Season = testf['Title'].str.extract(r'^(([\w\W].*?) (Season \d{1,3})(?:: ))?.*?([A-Za-z: ].*)?')
+    pattern = r'^([\w\W].*?) (?=.*?(Season \d{1,3})?(?:: ))\2.([\w !@#$%\^&\*\(\)-_\=\+].*)$'
+    pattern = r'^([\w\W].*?) (?=.*?(Season \d{1,3})?(?:: ))\2.| ?([\w !@#$%\^&\*\(\)\-_\=\+].*)$'
+    pattern = r'^([\w\W].*?) (?=.*?(Season \d{1,3})?(?:: ))\2.([\w !@#$%\^&\*\(\)\-_\=\+].*)| ?([\w !@#$%\^&\*\(\)\-_\=\+].*)$'
+    workingpattern = r'^([\w\W].*?):? (?=.*?(Season \d{1,3})?: )\2. ([\w !@#$%\^&\*\(\)\-_\=\+].*) \((Episode \d{1,3})\)$| ?([\w !@#$%\^&\*\(\)\-_\=\+].*)$'
+    simplerpattern = r'^(([\w\W].*?):? (Season \d{1,3})?:? ([\w\W].*?)? \(?(Episode \d{1,3})?\).*?)|([\w\W].*?)$'
+    #Wanting to change the pattern up to stop at the first : before Season: or after the last : - would treat comedians like series, would catch 30 for 30
+    #Split pattern into or variable chunks for ease of reading, line saving
+    pattern = r'^([\w\W].*?):? ((Season \d{1,3})?:? ([\w\W].*?)? \(?(Episode \d{1,3})?\).*?)$|^([\w\W].*?): ([\w\W].*?)$|^([\w\W].*?)$'
+    namedpat = r'(?|^(?P<sries>[\w\W].*?):? (?P<seasn>Season \d{1,3})?:? ([\w\W].*?)? \(?(?P<episd>Episode \d{1,3})?\).*?$|^(?P<sries>[\w\W].*?): (?P<episd>[\w\W].*?)$|^(?P<sries>[\w\W].*?)$)'
     testc = pd.concat([testf,Season],axis=1)
     testc.drop(['Title'], axis=1, inplace=True)
     #Don't want to do above just yet, but how it would be done
