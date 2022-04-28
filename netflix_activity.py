@@ -2,6 +2,7 @@
 '''Analyze Netflix Viewing Activity Data'''
 
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
 import datetime
 from matplotlib.backends.backend_pdf import PdfPages
@@ -45,16 +46,22 @@ def limited_analysis(limited_dataframe):
     # Calculate some interesting points
     top5 = df['Title'].value_counts().nlargest(5).to_string(name=False,dtype=False)
     #print top5 to return clean look
-    Season = testf['Title'].str.extract(r'^(([\w\W].*?) (Season \d{1,3})(?:: ))?.*?([A-Za-z: ].*)?')
-    pattern = r'^([\w\W].*?) (?=.*?(Season \d{1,3})?(?:: ))\2.([\w !@#$%\^&\*\(\)-_\=\+].*)$'
-    pattern = r'^([\w\W].*?) (?=.*?(Season \d{1,3})?(?:: ))\2.| ?([\w !@#$%\^&\*\(\)\-_\=\+].*)$'
-    pattern = r'^([\w\W].*?) (?=.*?(Season \d{1,3})?(?:: ))\2.([\w !@#$%\^&\*\(\)\-_\=\+].*)| ?([\w !@#$%\^&\*\(\)\-_\=\+].*)$'
-    workingpattern = r'^([\w\W].*?):? (?=.*?(Season \d{1,3})?: )\2. ([\w !@#$%\^&\*\(\)\-_\=\+].*) \((Episode \d{1,3})\)$| ?([\w !@#$%\^&\*\(\)\-_\=\+].*)$'
-    simplerpattern = r'^(([\w\W].*?):? (Season \d{1,3})?:? ([\w\W].*?)? \(?(Episode \d{1,3})?\).*?)|([\w\W].*?)$'
-    #Wanting to change the pattern up to stop at the first : before Season: or after the last : - would treat comedians like series, would catch 30 for 30
+    #Season = testf['Title'].str.extract(r'^(([\w\W].*?) (Season \d{1,3})(?:: ))?.*?([A-Za-z: ].*)?')
     #Split pattern into or variable chunks for ease of reading, line saving
     pattern = r'^([\w\W].*?):? ((Season \d{1,3})?:? ([\w\W].*?)? \(?(Episode \d{1,3})?\).*?)$|^([\w\W].*?): ([\w\W].*?)$|^([\w\W].*?)$'
-    namedpat = r'(?|^(?P<sries>[\w\W].*?):? (?P<seasn>Season \d{1,3})?:? ([\w\W].*?)? \(?(?P<episd>Episode \d{1,3})?\).*?$|^(?P<sries>[\w\W].*?): (?P<episd>[\w\W].*?)$|^(?P<sries>[\w\W].*?)$)'
+    namepat = r'^(?P<tvTI>[\w\W].*?):? (?P<tvSN>Season \d{1,3})?:? (?P<tvNM>[\w\W].*?)? \(?(?P<tvEP>Episode \d{1,3})?\).*?$|^(?P<specTI>[\w\W].*?): (?P<specNM>[\w\W].*?)$|^(?P<restTI>[\w\W].*?)$'
+    readablep = ("r'^(?P<tvTI>[\w\W].*?):? (?P<tvSN>Season \d{1,3})?:? (?P<tvNM>[\w\W].*?)?"
+        " \(?(?P<tvEP>Episode \d{1,3})?\).*?$|^(?P<specTI>[\w\W].*?): (?P<specNM>[\w\W].*?)$|"   
+        "^(?P<restTI>[\w\W].*?)$'")
+    tvpat = r'^(?P<tvTI>[\w\W].*?):? (?P<tvSN>Season \d{1,3})?:? (?P<tvNM>[\w\W].*?)? \(?(?P<tvEP>Episode \d{1,3})?\).*?$|'
+    specpat = r'^(?P<specTI>[\w\W].*?): (?P<specNM>[\w\W].*?)$|'
+    restpat = r'^(?P<restTI>[\w\W].*?)$'
+    catpat = 'tvpat + specpat + restpat'
+    branchpat = r'(?|^(?P<sries>[\w\W].*?):? (?P<seasn>Season \d{1,3})?:? ([\w\W].*?)? \(?(?P<episd>Episode \d{1,3})?\).*?$|^(?P<sries>[\w\W].*?): (?P<episd>[\w\W].*?)$|^(?P<sries>[\w\W].*?)$)'
+    Season = testf['TItle'].str.extract(pattern)
+    #Fill column 3 with Column 6 if Col 3 is NaN, and so on
+    Season[3] = Season[3].str.strip().replace('', np.nan).fillna(Season[6])
+    Season[0] = Season[0].str.strip().replace('', np.nan).fillna(Season[5])
     testc = pd.concat([testf,Season],axis=1)
     testc.drop(['Title'], axis=1, inplace=True)
     #Don't want to do above just yet, but how it would be done
