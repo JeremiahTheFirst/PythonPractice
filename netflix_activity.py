@@ -46,22 +46,15 @@ def limited_analysis(limited_dataframe):
     # Calculate some interesting points
     top5 = df['Title'].value_counts().nlargest(5).to_string(name=False,dtype=False)
     #print top5 to return clean look
-    #Season = testf['Title'].str.extract(r'^(([\w\W].*?) (Season \d{1,3})(?:: ))?.*?([A-Za-z: ].*)?')
-    #Split pattern into or variable chunks for ease of reading, line saving
-    pattern = r'^([\w\W].*?):? ((Season \d{1,3})?:? ([\w\W].*?)? \(?(Episode \d{1,3})?\).*?)$|^([\w\W].*?): ([\w\W].*?)$|^([\w\W].*?)$'
-    namepat = r'^(?P<tvTI>[\w\W].*?):? (?P<tvSN>Season \d{1,3})?:? (?P<tvNM>[\w\W].*?)? \(?(?P<tvEP>Episode \d{1,3})?\).*?$|^(?P<specTI>[\w\W].*?): (?P<specNM>[\w\W].*?)$|^(?P<restTI>[\w\W].*?)$'
-    readablep = ("r'^(?P<tvTI>[\w\W].*?):? (?P<tvSN>Season \d{1,3})?:? (?P<tvNM>[\w\W].*?)?"
-        " \(?(?P<tvEP>Episode \d{1,3})?\).*?$|^(?P<specTI>[\w\W].*?): (?P<specNM>[\w\W].*?)$|"   
-        "^(?P<restTI>[\w\W].*?)$'")
-    tvpat = r'^(?P<tvTI>[\w\W].*?):? (?P<tvSN>Season \d{1,3})?:? (?P<tvNM>[\w\W].*?)? \(?(?P<tvEP>Episode \d{1,3})?\).*?$|'
-    specpat = r'^(?P<specTI>[\w\W].*?): (?P<specNM>[\w\W].*?)$|'
-    restpat = r'^(?P<restTI>[\w\W].*?)$'
-    catpat = 'tvpat + specpat + restpat'
-    branchpat = r'(?|^(?P<sries>[\w\W].*?):? (?P<seasn>Season \d{1,3})?:? ([\w\W].*?)? \(?(?P<episd>Episode \d{1,3})?\).*?$|^(?P<sries>[\w\W].*?): (?P<episd>[\w\W].*?)$|^(?P<sries>[\w\W].*?)$)'
-    Season = testf['TItle'].str.extract(pattern)
+    tv_pat = r'^(?P<EP_title>[\w\W].*?):? (?P<EP_season>Season \d{1,3})?:? (?P<EP_name>[\w\W].*?)? \(?(?P<EP_number>Episode \d{1,3})?\).*?$|'
+    spec_pat = r'^(?P<SPEC_title>[\w\W].*?): (?P<SPEC_name>[\w\W].*?)$|'
+    other_pat = r'^(?P<OTHER_title>[\w\W].*?)$'
+    catpat = 'tv_pat + spec_pat + rest_pat'
+    #branchpat = r'(?|^(?P<sries>[\w\W].*?):? (?P<seasn>Season \d{1,3})?:? ([\w\W].*?)? \(?(?P<episd>Episode \d{1,3})?\).*?$|^(?P<sries>[\w\W].*?): (?P<episd>[\w\W].*?)$|^(?P<sries>[\w\W].*?)$)'
+    Breakdown = limited_dataframe['Title'].str.extract(pattern)
     #Fill column 3 with Column 6 if Col 3 is NaN, and so on
-    Season[3] = Season[3].str.strip().replace('', np.nan).fillna(Season[6])
-    Season[0] = Season[0].str.strip().replace('', np.nan).fillna(Season[5])
+    Breakdown[3] = Breakdown[3].str.strip().replace('', np.nan).fillna(Breakdown[6])
+    Breakdown[0] = Breakdown[0].str.strip().replace('', np.nan).fillna(Breakdown[5])
     testc = pd.concat([testf,Season],axis=1)
     testc.drop(['Title'], axis=1, inplace=True)
     #Don't want to do above just yet, but how it would be done
