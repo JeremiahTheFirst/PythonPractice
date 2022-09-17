@@ -44,20 +44,23 @@ def limited_analysis(limited_dataframe):
     '''Gets datapoints from the more limited sample provided '''
 
     # Calculate some interesting points
-    top5 = df['Title'].value_counts().nlargest(5).to_string(name=False,dtype=False)
+    top5 = limited_dataframe['Title'].value_counts().nlargest(5).to_string(name=False,dtype=False)
     #print top5 to return clean look
     tv_pat = r'^(?P<EP_title>[\w\W].*?):? (?P<EP_season>Season \d{1,3})?:? (?P<EP_name>[\w\W].*?)? \(?(?P<EP_number>Episode \d{1,3})?\).*?$|'
     spec_pat = r'^(?P<SPEC_title>[\w\W].*?): (?P<SPEC_name>[\w\W].*?)$|'
     other_pat = r'^(?P<OTHER_title>[\w\W].*?)$'
-    catpat = 'tv_pat + spec_pat + rest_pat'
     #branchpat = r'(?|^(?P<sries>[\w\W].*?):? (?P<seasn>Season \d{1,3})?:? ([\w\W].*?)? \(?(?P<episd>Episode \d{1,3})?\).*?$|^(?P<sries>[\w\W].*?): (?P<episd>[\w\W].*?)$|^(?P<sries>[\w\W].*?)$)'
-    Breakdown = limited_dataframe['Title'].str.extract(pattern)
-    #Fill column 3 with Column 6 if Col 3 is NaN, and so on
-    Breakdown[3] = Breakdown[3].str.strip().replace('', np.nan).fillna(Breakdown[6])
-    Breakdown[0] = Breakdown[0].str.strip().replace('', np.nan).fillna(Breakdown[5])
-    testc = pd.concat([testf,Season],axis=1)
-    testc.drop(['Title'], axis=1, inplace=True)
-    #Don't want to do above just yet, but how it would be done
+    Breakdown = limited_dataframe['Title'].str.extract(tv_pat + spec_pat + other_pat)
+    #Fill NaN in named column with value from last column - EP_name with SPEC_name
+    #And then EP_title with SPEC_title and OTHER_title, so that EP_title will always have title info
+    Breakdown['EP_name'] = Breakdown['EP_name'].str.strip().replace('', np.nan).fillna(Breakdown['SPEC_name'])
+    Breakdown['EP_title'] = Breakdown['EP_title'].str.strip().replace('', np.nan).fillna(Breakdown['SPEC_title'])
+    Breakdown['EP_title'] = Breakdown['EP_title'].str.strip().replace('', np.nan).fillna(Breakdown['OTHER_title'])
+    #Combine df with better title info with original df
+    Breakdown = pd.concat([Breakdown,limited_dataframe],axis=1)
+    #Drop original df title column since it is broken into more useful columns
+    Breakdown.drop(['Title'], axis=1, inplace=True)
+    
     total_time_watched = limited_dataframe['Duration'].sum()
     mode_time_watched = limited_dataframe['Duration'].mode(dropna=True)[0]
     mean_time_watched = limited_dataframe['Duration'].mean()
