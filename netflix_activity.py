@@ -68,7 +68,7 @@ def limited_analysis(limited_dataframe):
     mode_time_watched = time_breakdown.split(mode_time_watched)
     mean_time_watched = time_breakdown.split(mean_time_watched)
     median_time_watched = time_breakdown.split(median_time_watched)
-    pr0t ('The total time watched is: {}\nThe mode time watched is: {}'.format(total_time_watched,mode_time_watched))
+    print ('The total time watched is: {}\nThe mode time watched is: {}'.format(total_time_watched,mode_time_watched))
     print ('The mean time watched is: {}\nThe median time watched is: {}'.format(mean_time_watched,median_time_watched))
     return total_time_watched,mode_time_watched,mean_time_watched,median_time_watched
 
