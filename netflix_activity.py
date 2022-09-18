@@ -59,8 +59,8 @@ def limited_analysis(limited_dataframe):
     #Combine df with better title info with original df
     Breakdown = pd.concat([Breakdown,limited_dataframe],axis=1)
     #Drop original df title column since it is broken into more useful columns
-    Breakdown.drop(['Title'], axis=1, inplace=True)
-    
+    Breakdown = Breakdown.drop(['Title'], axis=1)
+
     total_time_watched = limited_dataframe['Duration'].sum()
     mode_time_watched = limited_dataframe['Duration'].mode(dropna=True)[0]
     mean_time_watched = limited_dataframe['Duration'].mean()
@@ -68,7 +68,7 @@ def limited_analysis(limited_dataframe):
     mode_time_watched = time_breakdown.split(mode_time_watched)
     mean_time_watched = time_breakdown.split(mean_time_watched)
     median_time_watched = time_breakdown.split(median_time_watched)
-    print ('The total time watched is: {}\nThe mode time watched is: {}'.format(total_time_watched,mode_time_watched))
+    pr0t ('The total time watched is: {}\nThe mode time watched is: {}'.format(total_time_watched,mode_time_watched))
     print ('The mean time watched is: {}\nThe median time watched is: {}'.format(mean_time_watched,median_time_watched))
     return total_time_watched,mode_time_watched,mean_time_watched,median_time_watched
 
