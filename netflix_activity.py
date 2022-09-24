@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 '''Analyze Netflix Viewing Activity Data'''
 
+from textwrap import dedent
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -45,6 +46,9 @@ def limited_analysis(limited_dataframe):
 
     # Calculate some interesting points
     top5 = limited_dataframe['Title'].value_counts().nlargest(5).to_string(name=False,dtype=False)
+    test5 = top5.split('\n')
+    for x in range(5):
+        print("%d. %s" % (x+1,test5[x]))
     #print top5 to return clean look
     tv_pat = r'^(?P<EP_title>[\w\W].*?):? (?P<EP_season>Season \d{1,3})?:? (?P<EP_name>[\w\W].*?)? \(?(?P<EP_number>Episode \d{1,3})?\).*?$|'
     spec_pat = r'^(?P<SPEC_title>[\w\W].*?): (?P<SPEC_name>[\w\W].*?)$|'
@@ -89,9 +93,14 @@ def graph_test(graph_result):
     plt.close()
     
 def generate_report(analysis):
-    rpt_txt = 'The total time watched is:        {}\nThe mode time watched is:      {}\n'.format(analysis[0],analysis[1])
-    rpt_txt += 'The mean time watched is:      {}\nThe median time watched is:   {}\n'.format(analysis[2],analysis[3])
-    return rpt_txt    
+    import textwrap
+    rpt_txt = """\
+        The total time watched is:        {}
+        The mode time watched is:      {}
+        The mean time watched is:      {}
+        The median time watched is:   {}
+        """.format(analysis[0],analysis[1],analysis[2],analysis[3])
+    return dedent(rpt_txt)
     
 def graph_change(rpt_txt):
     '''Alternate graph method '''
