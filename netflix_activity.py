@@ -45,15 +45,10 @@ def limited_analysis(limited_dataframe):
     '''Gets datapoints from the more limited sample provided '''
 
     # Calculate some interesting points
-    top5 = limited_dataframe['Title'].value_counts().nlargest(5).to_string(name=False,dtype=False)
-    test5 = top5.split('\n')
-    for x in range(5):
-        print("%d. %s" % (x+1,test5[x]))
-    #print top5 to return clean look
+    #Regex patterns for corrolating TV to movie to specials
     tv_pat = r'^(?P<EP_title>[\w\W].*?):? (?P<EP_season>Season \d{1,3})?:? (?P<EP_name>[\w\W].*?)? \(?(?P<EP_number>Episode \d{1,3})?\).*?$|'
     spec_pat = r'^(?P<SPEC_title>[\w\W].*?): (?P<SPEC_name>[\w\W].*?)$|'
     other_pat = r'^(?P<OTHER_title>[\w\W].*?)$'
-    #branchpat = r'(?|^(?P<sries>[\w\W].*?):? (?P<seasn>Season \d{1,3})?:? ([\w\W].*?)? \(?(?P<episd>Episode \d{1,3})?\).*?$|^(?P<sries>[\w\W].*?): (?P<episd>[\w\W].*?)$|^(?P<sries>[\w\W].*?)$)'
     Breakdown = limited_dataframe['Title'].str.extract(tv_pat + spec_pat + other_pat)
     #Fill NaN in named column with value from last column - EP_name with SPEC_name
     #And then EP_title with SPEC_title and OTHER_title, so that EP_title will always have title info
@@ -75,6 +70,16 @@ def limited_analysis(limited_dataframe):
     print ('The total time watched is: {}\nThe mode time watched is: {}'.format(total_time_watched,mode_time_watched))
     print ('The mean time watched is: {}\nThe median time watched is: {}'.format(mean_time_watched,median_time_watched))
     return total_time_watched,mode_time_watched,mean_time_watched,median_time_watched
+
+def top5_analysis(limited_dataframe):
+    '''Identify the top 5 watched items from the analyzed file'''
+
+    top5 = limited_dataframe['Title'].value_counts().nlargest(5).to_string(name=False,dtype=False)
+    top5 = top5.split('\n')
+    for x in range(5):
+        print("%d. %s" % (x+1,top5[x]))
+    #print top5 to return clean look
+    return top5
 
 def graph_by_day(by_day_dataframe):
     '''Graph provided dataset by day and output to PDF'''
@@ -134,6 +139,7 @@ def graph_change(rpt_txt):
 if __name__ == "__main__":
     limited_dataframe = analyse()
     analysis = limited_analysis(limited_dataframe)
+    top5 = top5_analysis(limited_dataframe)
     rpt_txt = generate_report(analysis)
     #graph_change(rpt_txt)
     graph_plots = graphs.graphnalysis(limited_dataframe,'Anything Watched by Day (ex. Previews)')
