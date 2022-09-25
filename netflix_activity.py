@@ -98,18 +98,11 @@ def graph_test(graph_result):
     plt.close()
     
 def generate_report(analysis):
-    import textwrap
-    rpt_txt = """\
-        The total time watched is:        {}
-        The mode time watched is:      {}
-        The mean time watched is:      {}
-        The median time watched is:   {}
-        """.format(analysis[0],analysis[1],analysis[2],analysis[3])
     pdf_txt = ["The total time watched is:        {}".format(analysis[0])]
     pdf_txt.append("The mode time watched is:      {}".format(analysis[1]))
     pdf_txt.append("The mean time watched is:      {}".format(analysis[2]))
     pdf_txt.append("The median time watched is:   {}".format(analysis[3]))
-    return dedent(rpt_txt),pdf_txt
+    return pdf_txt
 
 def generate_pdf(input,drawing,path):
     '''Generate a PDF with more refined controls'''
@@ -127,10 +120,10 @@ def generate_pdf(input,drawing,path):
     my_canvas.setFont('Helvetica', 20)
     my_canvas.drawString(200,750,'Netflix Activity Analysis')
     my_canvas.setFont('Helvetica', 12)
-    my_canvas.drawString(30,700,input[0])
-    my_canvas.drawString(30,685,input[1])
-    my_canvas.drawString(30,670,input[2])
-    my_canvas.drawString(30,655,input[3])
+    my_canvas.drawString(30,715,input[0])
+    my_canvas.drawString(30,700,input[1])
+    my_canvas.drawString(30,685,input[2])
+    my_canvas.drawString(30,670,input[3])
     my_canvas.showPage()
     my_canvas.setPageSize((1120,780))
     renderPDF.draw(drawing,my_canvas,20,10)
@@ -140,7 +133,7 @@ if __name__ == "__main__":
     limited_dataframe = analyse()
     analysis = limited_analysis(limited_dataframe)
     top5 = top5_analysis(limited_dataframe)
-    rpt_txt,pdf_txt = generate_report(analysis)
+    pdf_txt = generate_report(analysis)
     #graph_change(rpt_txt)
     graph_plots = graphs.graphnalysis(limited_dataframe,'Anything Watched by Day (ex. Previews)')
     drawing=graphs.graph_result(graph_plots)
