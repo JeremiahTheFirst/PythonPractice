@@ -105,8 +105,33 @@ def generate_report(analysis):
         The mean time watched is:      {}
         The median time watched is:   {}
         """.format(analysis[0],analysis[1],analysis[2],analysis[3])
-    return dedent(rpt_txt)
-    
+    pdf_txt = ["The total time watched is:        {}".format(analysis[0])]
+    pdf_txt.append("The mode time watched is:      {}".format(analysis[1]))
+    pdf_txt.append("The mean time watched is:      {}".format(analysis[2]))
+    pdf_txt.append("The median time watched is:   {}".format(analysis[3]))
+    return dedent(rpt_txt),pdf_txt
+
+def generate_pdf(input,path):
+    '''Generate a PDF with more refined controls'''
+
+    from reportlab.lib.pagesizes import letter
+    from reportlab.pdfgen import canvas
+
+    my_canvas = canvas.Canvas(path, pagesize=letter)
+    my_canvas.setTitle("Netflix Activity Analysis")
+    my_canvas.setAuthor("Jeremiah Adams")
+    my_canvas.setSubject("Stats and graphs on the user\'s supplied Netflix activity")
+    my_canvas.setKeywords("Netflix DataScience Statistics")
+    my_canvas.setLineWidth(.3)
+    my_canvas.setFont('Helvetica', 20)
+    my_canvas.drawString(200,750,'Netflix Activity Analysis')
+    my_canvas.setFont('Helvetica', 12)
+    my_canvas.drawString(30,730,input[0])
+    my_canvas.drawString(30,715,input[1])
+    my_canvas.drawString(30,700,input[2])
+    my_canvas.drawString(30,685,input[3])
+    my_canvas.save()
+
 def graph_change(rpt_txt):
     '''Alternate graph method '''
     with PdfPages('NetflixActivityAnalysis.pdf') as pdf:
@@ -140,7 +165,8 @@ if __name__ == "__main__":
     limited_dataframe = analyse()
     analysis = limited_analysis(limited_dataframe)
     top5 = top5_analysis(limited_dataframe)
-    rpt_txt = generate_report(analysis)
+    rpt_txt,pdf_txt = generate_report(analysis)
+    generate_pdf(pdf_txt,'new.pdf')
     #graph_change(rpt_txt)
     graph_plots = graphs.graphnalysis(limited_dataframe,'Anything Watched by Day (ex. Previews)')
     graphs.graph_result(rpt_txt,graph_plots)
