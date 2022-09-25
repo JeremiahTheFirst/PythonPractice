@@ -111,11 +111,12 @@ def generate_report(analysis):
     pdf_txt.append("The median time watched is:   {}".format(analysis[3]))
     return dedent(rpt_txt),pdf_txt
 
-def generate_pdf(input,path):
+def generate_pdf(input,drawing,path):
     '''Generate a PDF with more refined controls'''
 
     from reportlab.lib.pagesizes import letter
     from reportlab.pdfgen import canvas
+    from reportlab.graphics import renderPDF
 
     my_canvas = canvas.Canvas(path, pagesize=letter)
     my_canvas.setTitle("Netflix Activity Analysis")
@@ -126,52 +127,21 @@ def generate_pdf(input,path):
     my_canvas.setFont('Helvetica', 20)
     my_canvas.drawString(200,750,'Netflix Activity Analysis')
     my_canvas.setFont('Helvetica', 12)
-    my_canvas.drawString(30,730,input[0])
-    my_canvas.drawString(30,715,input[1])
-    my_canvas.drawString(30,700,input[2])
-    my_canvas.drawString(30,685,input[3])
+    my_canvas.drawString(30,700,input[0])
+    my_canvas.drawString(30,685,input[1])
+    my_canvas.drawString(30,670,input[2])
+    my_canvas.drawString(30,655,input[3])
+    my_canvas.showPage()
+    my_canvas.setPageSize((1120,780))
+    renderPDF.draw(drawing,my_canvas,20,10)
     my_canvas.save()
-
-def graph_change(rpt_txt):
-    '''Alternate graph method '''
-    with PdfPages('NetflixActivityAnalysis.pdf') as pdf:
-        first_page = plt.figure(figsize=(11.69,8.27))
-        first_page.clf()
-        rpt_title = 'Netflix Activity Analysis'
-        first_page.text(0.5,.9,rpt_title,fontsize=24, ha='center')
-        first_page.text(0.1,.75,rpt_txt)
-        pdf.savefig()
-        plt.close()
-        
-        no_previews_by_day = no_previews['weekday'].value_counts()
-        no_previews_by_day = no_previews_by_day.sort_index()
-        no_previews_by_day.plot(kind='bar', figsize=(10,5), title='Anything Watched by Day (ex. Previews)')
-        plt.tight_layout()
-        pdf.savefig()
-        #plt.show()
-        plt.close()
-        
-        #Set PDF metadata
-        d = pdf.infodict()
-        d['Title'] ='Netflix Activity Analysis'
-        # Will need to consider identifying user - would need to be OS agnostic
-        d['Author'] = 'Jeremiah Adams'
-        d['Subject'] = 'Stats and graphs on the user\'s supplied Netflix Activity'
-        d['Keywords'] = 'Netflix DataScience Statistics'
-        d['CreationDate'] = datetime.datetime(2022, 3, 30)
-        d['ModDate'] = datetime.datetime.today()
         
 if __name__ == "__main__":
     limited_dataframe = analyse()
     analysis = limited_analysis(limited_dataframe)
     top5 = top5_analysis(limited_dataframe)
     rpt_txt,pdf_txt = generate_report(analysis)
-    generate_pdf(pdf_txt,'new.pdf')
     #graph_change(rpt_txt)
     graph_plots = graphs.graphnalysis(limited_dataframe,'Anything Watched by Day (ex. Previews)')
-    graphs.graph_result(rpt_txt,graph_plots)
-    
-    #Report section
-    #title = 'Netflix Activity Analysis'
-    #filename = 'NetflixActivityAnalysis.pdf'
-    #paragraph = generate_report(analysis)
+    drawing=graphs.graph_result(graph_plots)
+    generate_pdf(pdf_txt,drawing,'NetflixActivityAnalysis.pdf')
