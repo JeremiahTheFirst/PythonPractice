@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 '''Analyze Netflix Viewing Activity Data'''
 
+from cgitb import grey
 from textwrap import dedent
 import pandas as pd
 import numpy as np
@@ -124,17 +125,46 @@ def generate_pdf(input,drawing,path):
     my_canvas.drawString(30,700,input[1])
     my_canvas.drawString(30,685,input[2])
     my_canvas.drawString(30,670,input[3])
+
     my_canvas.showPage()
     my_canvas.setPageSize((1120,780))
     renderPDF.draw(drawing,my_canvas,20,10)
     my_canvas.save()
-        
+
+def table_test(top5):
+    
+    from reportlab.lib.pagesizes import letter
+    from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
+    import re
+    import numpy as np
+
+    doc = SimpleDocTemplate(
+        "test.pdf",
+        pagesize=letter,
+        )
+
+    flowables = []
+    
+    ranks = [str(x+1) for x in range(5)]
+    titles = [re.split('  * ',top5[x])[0] for x in range(5)]
+    views = [re.split('  * ',top5[x])[1] for x in range(5)]
+
+    tbldat = [
+            ranks,titles,views
+            ]
+    tbldat = np.transpose(tbldat) #transpose turns tbldat list into a np.array
+    tbldat = tbldat.tolist() #so turn it back into a list
+    tbldat.insert(0,['Rank','Title','Views']) #add column headers to the start
+    tbl = Table(tbldat)
+    flowables.append(tbl)
+    doc.build(flowables)
+
 if __name__ == "__main__":
     limited_dataframe = analyse()
     analysis = limited_analysis(limited_dataframe)
     top5 = top5_analysis(limited_dataframe)
+    table_test(top5)
     pdf_txt = generate_report(analysis)
-    #graph_change(rpt_txt)
     graph_plots = graphs.graphnalysis(limited_dataframe,'Anything Watched by Day (ex. Previews)')
     drawing=graphs.graph_result(graph_plots)
     generate_pdf(pdf_txt,drawing,'NetflixActivityAnalysis.pdf')
