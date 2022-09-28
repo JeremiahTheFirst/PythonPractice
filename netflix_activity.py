@@ -134,17 +134,25 @@ def generate_pdf(input,drawing,path):
 def table_test(top5):
     
     from reportlab.lib.pagesizes import letter
-    from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
+    from reportlab.lib.styles import getSampleStyleSheet
+    from reportlab.lib.units import inch
+    from reportlab.platypus import SimpleDocTemplate, Table, Paragraph, Spacer, TableStyle
     import re
     import numpy as np
 
+    styles = getSampleStyleSheet()
     doc = SimpleDocTemplate(
         "test.pdf",
         pagesize=letter,
         )
 
     flowables = []
-    
+    text = """Below, you can see the 5 most watched episodes and the
+    number of views they received."""
+    para = Paragraph(text, styles['Normal'])
+    lnbr = Spacer(1,0.25*inch)
+    flowables.append(para)
+    flowables.append(lnbr)
     ranks = [str(x+1) for x in range(5)]
     titles = [re.split('  * ',top5[x])[0] for x in range(5)]
     views = [re.split('  * ',top5[x])[1] for x in range(5)]
@@ -157,6 +165,7 @@ def table_test(top5):
     tbldat.insert(0,['Rank','Title','Views']) #add column headers to the start
     tbl = Table(tbldat)
     flowables.append(tbl)
+    print(flowables)
     doc.build(flowables)
 
 if __name__ == "__main__":
