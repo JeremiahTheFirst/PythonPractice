@@ -18,7 +18,7 @@ import time_breakdown
 #pd.options.mode.chained_assignment = None #default='warn'
 #file = 'ViewingActivity.csv'
 
-def analyse(file='ViewingActivity.csv'):
+def analyze(file='ViewingActivity.csv'):
     '''Convert 'Start Time' column from object to datetime, then convert to Central timezone '''
     df = pd.read_csv(file)
     df['Start Time'] = pd.to_datetime(df['Start Time'], utc=True)
@@ -131,12 +131,12 @@ def generate_pdf(input,drawing,path):
     renderPDF.draw(drawing,my_canvas,20,10)
     my_canvas.save()
 
-def table_test(top5):
+def table_test(input,top5):
     
     from reportlab.lib.pagesizes import letter
     from reportlab.lib.styles import getSampleStyleSheet
     from reportlab.lib.units import inch
-    from reportlab.platypus import SimpleDocTemplate, Table, Paragraph, Spacer, TableStyle
+    from reportlab.platypus import SimpleDocTemplate, Table, Paragraph, Spacer, ListFlowable, TableStyle
     import re
     import numpy as np
 
@@ -147,10 +147,29 @@ def table_test(top5):
         )
 
     flowables = []
+    title = Paragraph("Netflix Activity Analysis", styles['Title'])
+    intro = Paragraph("From analyzing the provided data we can provide some facts.",
+        styles['Normal'])
+    totals = ListFlowable(
+                [
+                    Paragraph(input[0],styles['Bullet']),
+                    Paragraph(input[1],styles['Bullet']),
+                    Paragraph(input[2],styles['Bullet']),
+                    Paragraph(input[3],styles['Bullet'])
+                ],
+                bulletType = 'bullet',
+                bulletFontSize = 8,
+                start='circle',
+    )
     text = """Below, you can see the 5 most watched episodes and the
     number of views they received."""
     para = Paragraph(text, styles['Normal'])
     lnbr = Spacer(1,0.25*inch)
+    flowables.append(title)
+    flowables.append(intro)
+    flowables.append(lnbr)
+    flowables.append(totals)
+    flowables.append(lnbr)
     flowables.append(para)
     flowables.append(lnbr)
     ranks = [str(x+1) for x in range(5)]
@@ -165,15 +184,14 @@ def table_test(top5):
     tbldat.insert(0,['Rank','Title','Views']) #add column headers to the start
     tbl = Table(tbldat)
     flowables.append(tbl)
-    print(flowables)
     doc.build(flowables)
 
 if __name__ == "__main__":
-    limited_dataframe = analyse()
+    limited_dataframe = analyze()
     analysis = limited_analysis(limited_dataframe)
     top5 = top5_analysis(limited_dataframe)
-    table_test(top5)
     pdf_txt = generate_report(analysis)
+    table_test(pdf_txt,top5)
     graph_plots = graphs.graphnalysis(limited_dataframe,'Anything Watched by Day (ex. Previews)')
     drawing=graphs.graph_result(graph_plots)
     generate_pdf(pdf_txt,drawing,'NetflixActivityAnalysis.pdf')
