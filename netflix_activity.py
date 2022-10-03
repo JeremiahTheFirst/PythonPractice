@@ -2,6 +2,7 @@
 '''Analyze Netflix Viewing Activity Data'''
 
 from cgitb import grey
+from mmap import PAGESIZE
 from textwrap import dedent
 import pandas as pd
 import numpy as np
@@ -10,6 +11,7 @@ import datetime
 from matplotlib.backends.backend_pdf import PdfPages
 import graphs
 import time_breakdown
+import reports
 
 # Columns - Profile Name, Start Time, Duration, Attributes, Title, 
 #           Supplemental Video Type, Device Type, Bookmark, Latest Bookmark, Country
@@ -131,12 +133,22 @@ def generate_pdf(input,drawing,path):
     renderPDF.draw(drawing,my_canvas,20,10)
     my_canvas.save()
 
-def table_test(input,top5):
+def table_test(input,top5,out_chart):
     
-    from reportlab.lib.pagesizes import letter
+    from reportlab.lib.pagesizes import letter,A2
     from reportlab.lib.styles import getSampleStyleSheet
     from reportlab.lib.units import inch
-    from reportlab.platypus import SimpleDocTemplate, Table, Paragraph, Spacer, ListFlowable, TableStyle
+    from reportlab.platypus import  (
+        SimpleDocTemplate, 
+        Table, 
+        Paragraph, 
+        Spacer, 
+        ListFlowable,
+        NextPageTemplate,
+        PageTemplate,
+        PageBreak,
+        TableStyle
+    )
     import re
     import numpy as np
 
@@ -145,6 +157,9 @@ def table_test(input,top5):
         "test.pdf",
         pagesize=letter,
         )
+    doc.addPageTemplates([
+        PageTemplate(id='BigDraw', pagesize=(1120,780)),
+    ])
 
     flowables = []
     title = Paragraph("Netflix Activity Analysis", styles['Title'])
@@ -184,6 +199,9 @@ def table_test(input,top5):
     tbldat.insert(0,['Rank','Title','Views']) #add column headers to the start
     tbl = Table(tbldat)
     flowables.append(tbl)
+    flowables.append(NextPageTemplate('BigDraw'))
+    flowables.append(PageBreak())
+    flowables.append(drawing)
     doc.build(flowables)
 
 if __name__ == "__main__":
@@ -191,7 +209,9 @@ if __name__ == "__main__":
     analysis = limited_analysis(limited_dataframe)
     top5 = top5_analysis(limited_dataframe)
     pdf_txt = generate_report(analysis)
-    table_test(pdf_txt,top5)
     graph_plots = graphs.graphnalysis(limited_dataframe,'Anything Watched by Day (ex. Previews)')
     drawing=graphs.graph_result(graph_plots)
     generate_pdf(pdf_txt,drawing,'NetflixActivityAnalysis.pdf')
+    #table_test(pdf_txt,top5,drawing)
+    #reports.pdf_report("test2.pdf",pdf_txt,drawing)
+    reports.AnalyticsReport('test3.pdf','Netflix Activity Analysis',pdf_txt,top5,drawing)
