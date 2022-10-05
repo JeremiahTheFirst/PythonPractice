@@ -1,4 +1,5 @@
 import re
+from turtle import title
 import numpy as np
 from reportlab.lib.pagesizes import A4,letter
 from reportlab.lib.styles import getSampleStyleSheet
@@ -112,8 +113,8 @@ class AnalyticsReport(BaseDocTemplate):
         text = """Below, you can see the 5 most watched episodes and the
         number of views they received."""
         para = Paragraph(text, style)
-        story.append(lnbr)
         story.append(para)
+        story.append(lnbr)
         ranks = [str(x+1) for x in range(5)]
         titles = [re.split('  * ',top5[x])[0] for x in range(5)]
         views = [re.split('  * ',top5[x])[1] for x in range(5)]
@@ -128,26 +129,12 @@ class AnalyticsReport(BaseDocTemplate):
         story.append(tbl)
         story.append(NextPageTemplate('BigPage'))
         story.append(PageBreak())
-        #story.append(NextPageTemplate('TwoCol'))
-        #story.append(PageBreak())
-        #story.append(Paragraph("Frame two columns,  " * 500, style))
-        #story.append(NextPageTemplate('testpage'))
-        #story.append(PageBreak())
         story.append(drawing)
-        story.append(NextPageTemplate('LaterPages'))
-        story.append(PageBreak())
-        story.append(Paragraph('What gives'))
-        #table_grid = [["Product", "Quantity"]]
-        # Add the objects
-        #for shipped_object in self.objects:
-        #    table_grid.append([shipped_object, "42"])
 
-        #story.append(Table(table_grid, repeatRows=1, 
-        #    colWidths=[0.5 * self.width, 0.5 * self.width],
-        #    style=TableStyle([('GRID',(0,1),(-1,-1),0.25,colors.gray),
-        #                    ('BOX', (0,0), (-1,-1), 1.0, colors.black),
-        #                    ('BOX', (0,0), (1,0), 1.0, colors.black),
-        #                    ])))
+        self.title=rpt_title
+        self.author='Jeremiah Adams'
+        self.subject='Stats and graphs on the user\'s supplied Netflix activity'
+        self.keywords='Netflix DataScience Statistics'
 
         self.build(story,canvasmaker=NumberedCanvas)
 
@@ -171,9 +158,6 @@ class AnalyticsReport(BaseDocTemplate):
             doc.page_height - 0.5 * cm, self.rpt_title)
 
         canvas.restoreState()
-
-#if __name__ == '__main__':
-#    AnalyticsReport('example2.pdf', "Their address", ["Product", "Product"] * 50)
 
 def pdf_report(pdf_name,input,drawing):
     doc = BaseDocTemplate(pdf_name, showBoundary=1, pagesize=letter)
