@@ -44,9 +44,9 @@ class NumberedCanvas(canvas.Canvas):
         self.setLineWidth(0.1)
         self.setStrokeColor(colors.black, alpha=0.2)
         self.setFillColor(colors.black, alpha=0.4)
-        self.line(cm, 1.5 * cm, letter[0] - cm, 1.5 * cm)
+        self.line(cm, 1.5 * cm, self._pagesize[0] - cm, 1.5 * cm)
         self.drawRightString(
-            letter[0] - cm, 1.1 * cm, 
+            self._pagesize[0] - cm, 1.1 * cm, 
             "Page %d of %d" % (self._pageNumber, page_count)
         )
 
@@ -130,6 +130,9 @@ class AnalyticsReport(BaseDocTemplate):
         story.append(NextPageTemplate('BigPage'))
         story.append(PageBreak())
         story.append(drawing)
+        story.append(NextPageTemplate('LaterPages'))
+        story.append(PageBreak())
+        story.append(Paragraph("need another page example"))
 
         self.title=rpt_title
         self.author='Jeremiah Adams'
@@ -154,7 +157,7 @@ class AnalyticsReport(BaseDocTemplate):
         canvas.setFont('Helvetica', 9)
         canvas.setStrokeColor(colors.black, alpha=0.2)
         canvas.setFillColor(colors.black, alpha=0.4)
-        canvas.drawString(0.825 * (doc.page_width), 
+        canvas.drawString(canvas._pagesize[0] - 4.1 * cm, 
             doc.page_height - 0.5 * cm, self.rpt_title)
 
         canvas.restoreState()

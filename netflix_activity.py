@@ -214,4 +214,4 @@ if __name__ == "__main__":
     #generate_pdf(pdf_txt,drawing,'NetflixActivityAnalysis.pdf')
     #table_test(pdf_txt,top5,drawing)
     #reports.pdf_report("test2.pdf",pdf_txt,drawing)
-    reports.AnalyticsReport('NetflixActivityANalysis.pdf','Netflix Activity Analysis',pdf_txt,top5,drawing)
+    reports.AnalyticsReport('NetflixActivityAnalysis.pdf','Netflix Activity Analysis',pdf_txt,top5,drawing)
