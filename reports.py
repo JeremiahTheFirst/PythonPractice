@@ -130,9 +130,6 @@ class AnalyticsReport(BaseDocTemplate):
         story.append(NextPageTemplate('BigPage'))
         story.append(PageBreak())
         story.append(drawing)
-        story.append(NextPageTemplate('LaterPages'))
-        story.append(PageBreak())
-        story.append(Paragraph("need another page example"))
 
         self.title=rpt_title
         self.author='Jeremiah Adams'

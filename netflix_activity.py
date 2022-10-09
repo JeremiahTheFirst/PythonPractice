@@ -47,9 +47,8 @@ def expand_dataframe(limited_dataframe):
     '''Clean up and standerdize dataframe to make data comparable'''
 
     #Regex patterns for corrolating TV to movie to specials
-    tv_pat = r'^(?P<EP_title>[\w\W].*?):? \
-        (?P<EP_season>Season \d{1,3})?:? (?P<EP_name>[\w\W].*?)? \(?\
-            (?P<EP_number>Episode \d{1,3})?\).*?$|'
+    tv_pat = r'^(?P<EP_title>[\w\W].*?):? (?P<EP_season>Season \d{1,3})?:? '\
+        '(?P<EP_name>[\w\W].*?)? \(?(?P<EP_number>Episode \d{1,3})?\).*?$|'
     spec_pat = r'^(?P<SPEC_title>[\w\W].*?): (?P<SPEC_name>[\w\W].*?)$|'
     other_pat = r'^(?P<OTHER_title>[\w\W].*?)$'
     Breakdown = limited_dataframe['Title'].str.extract(tv_pat + spec_pat + other_pat)
