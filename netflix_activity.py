@@ -92,6 +92,13 @@ def top5_analysis(expanded_dataframe):
     for x in range(5):
         print("%d. %s" % (x+1,top5[x]))
     #print top5 to return clean look
+
+    tvdf = expanded_dataframe[~expanded_dataframe['EP_name'].isnull()]
+    top5tv = tvdf ['EP_title'].value_counts().nlargest(5).to_string\
+        (name=False,dtype=False)
+    top5tv = top5tv.split('\n')
+    for x in range(5):
+        print("%d. %s" % (x+1,top5tv[x]))    
     return top5
 
 def graph_by_day(by_day_dataframe):
