@@ -91,14 +91,40 @@ def top5_analysis(expanded_dataframe):
     top5 = top5.split('\n')
     for x in range(5):
         print("%d. %s" % (x+1,top5[x]))
-    #print top5 to return clean look
 
+    #Get top 5 for TV only
     tvdf = expanded_dataframe[~expanded_dataframe['EP_name'].isnull()]
-    top5tv = tvdf ['EP_title'].value_counts().nlargest(5).to_string\
+    top5tv = tvdf['EP_title'].value_counts().nlargest(5).to_string\
         (name=False,dtype=False)
     top5tv = top5tv.split('\n')
     for x in range(5):
-        print("%d. %s" % (x+1,top5tv[x]))    
+        print("%d. %s" % (x+1,top5tv[x]))
+
+    #Get top 5 for movies only
+    tvmov = expanded_dataframe[expanded_dataframe['EP_name'].isnull()]
+    top5mov = tvmov['EP_title'].value_counts().nlargest(5)
+    nmovies = top5mov.count()
+    top5mov = top5mov.to_string(name=False,dtype=False)
+    top5mov = top5mov.split('\n')
+    if nmovies >= 5:
+        for x in range(5):
+            print("%d. %s" % (x+1,top5mov[x]))
+    else:
+        for x in range(nmovies):
+            print("%d. %s" % (x+1,top5mov[x]))
+
+    #Get top 5 for specials only
+    tvspec = expanded_dataframe[~expanded_dataframe['SPEC_name'].isnull()]
+    top5spec = tvspec['EP_title'].value_counts().nlargest(5)
+    nspecs = top5spec.count()
+    top5spec = top5spec.to_string(name=False,dtype=False)
+    top5spec = top5spec.split('\n')
+    if nspecs >= 5:
+        for x in range(5):
+            print("%d. %s" % (x+1,top5spec[x]))
+    else:
+        for x in range(nspecs):
+            print("%d. %s" % (x+1,top5spec[x]))
     return top5
 
 def graph_by_day(by_day_dataframe):
