@@ -83,49 +83,20 @@ def limited_analysis(limited_dataframe):
     return total_time_watched,mode_time_watched,\
         mean_time_watched,median_time_watched
 
-def top5_analysis(expanded_dataframe):
+def top_x_analysis(expanded_dataframe,title_type,cnt,invert=False):
     '''Identify the top 5 watched items from the analyzed file'''
-
-    top5 = expanded_dataframe['EP_title'].value_counts().nlargest(5).to_string\
-        (name=False,dtype=False)
-    top5 = top5.split('\n')
-    for x in range(5):
-        print("%d. %s" % (x+1,top5[x]))
-
-    #Get top 5 for TV only
-    tvdf = expanded_dataframe[~expanded_dataframe['EP_name'].isnull()]
-    top5tv = tvdf['EP_title'].value_counts().nlargest(5).to_string\
-        (name=False,dtype=False)
-    top5tv = top5tv.split('\n')
-    for x in range(5):
-        print("%d. %s" % (x+1,top5tv[x]))
-
-    #Get top 5 for movies only
-    tvmov = expanded_dataframe[expanded_dataframe['EP_name'].isnull()]
-    top5mov = tvmov['EP_title'].value_counts().nlargest(5)
-    nmovies = top5mov.count()
-    top5mov = top5mov.to_string(name=False,dtype=False)
-    top5mov = top5mov.split('\n')
-    if nmovies >= 5:
-        for x in range(5):
-            print("%d. %s" % (x+1,top5mov[x]))
+    
+    if not invert:
+        top_x = expanded_dataframe[expanded_dataframe[title_type].isnull()]
     else:
-        for x in range(nmovies):
-            print("%d. %s" % (x+1,top5mov[x]))
-
-    #Get top 5 for specials only
-    tvspec = expanded_dataframe[~expanded_dataframe['SPEC_name'].isnull()]
-    top5spec = tvspec['EP_title'].value_counts().nlargest(5)
-    nspecs = top5spec.count()
-    top5spec = top5spec.to_string(name=False,dtype=False)
-    top5spec = top5spec.split('\n')
-    if nspecs >= 5:
-        for x in range(5):
-            print("%d. %s" % (x+1,top5spec[x]))
-    else:
-        for x in range(nspecs):
-            print("%d. %s" % (x+1,top5spec[x]))
-    return top5
+        top_x = expanded_dataframe[~expanded_dataframe[title_type].isnull()]
+    top_x = top_x['EP_title'].value_counts().nlargest(cnt)
+    num_x = top_x.count()
+    top_x = top_x.to_string(name=False,dtype=False)
+    top_x = top_x.split('\n')
+    for x in range(num_x):
+        print("%d. %s" % (x+1,top_x[x]))
+    return top_x
 
 def graph_by_day(by_day_dataframe):
     '''Graph provided dataset by day and output to PDF'''
@@ -155,7 +126,10 @@ if __name__ == "__main__":
     limited_dataframe = analyze()
     expanded_dataframe = expand_dataframe(limited_dataframe)
     analysis = limited_analysis(expanded_dataframe)
-    top5 = top5_analysis(expanded_dataframe)
+    top5 = top_x_analysis(expanded_dataframe,'EP_title',5,True)
+    top5tv = top_x_analysis(expanded_dataframe,'EP_name',5,True)
+    top5mov = top_x_analysis(expanded_dataframe,'EP_name',5) 
+    top5spec = top_x_analysis(expanded_dataframe,'SPEC_name',5,True)
     pdf_txt = generate_report(analysis)
     graph_plots = graphs.graphnalysis(limited_dataframe,\
         'Anything Watched by Day (ex. Previews)')
