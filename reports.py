@@ -52,7 +52,7 @@ class NumberedCanvas(canvas.Canvas):
 
 class AnalyticsReport(BaseDocTemplate):
     '''With great assistance from https://stackoverflow.com/a/39268987'''
-    def __init__(self, filename, rpt_title, input, top5, drawing, **kwargs):
+    def __init__(self, filename, rpt_title, input, topx, drawing, **kwargs):
         super().__init__(filename, page_size=A4, _pageBreakQuick=0, **kwargs)
         self.rpt_title = rpt_title
         self.input = input
@@ -110,14 +110,15 @@ class AnalyticsReport(BaseDocTemplate):
         story.append(lnbr)
         story.append(totals)
         story.append(lnbr)
-        text = """Below, you can see the 5 most watched episodes and the
-        number of views they received."""
+        top_num = len(topx)
+        text = """Below, you can see the %s most watched items and the
+        number of views they received.""" % (top_num)
         para = Paragraph(text, style)
         story.append(para)
         story.append(lnbr)
-        ranks = [str(x+1) for x in range(5)]
-        titles = [re.split('  * ',top5[x])[0] for x in range(5)]
-        views = [re.split('  * ',top5[x])[1] for x in range(5)]
+        """ranks = [str(x+1) for x in range(top_num)]
+        titles = [re.split('  * ',topx[x])[0] for x in range(top_num)]
+        views = [re.split('  * ',topx[x])[1] for x in range(top_num)]
 
         tbldat = [
                 ranks,titles,views
@@ -125,7 +126,8 @@ class AnalyticsReport(BaseDocTemplate):
         tbldat = np.transpose(tbldat) #transpose turns tbldat list into a np.array
         tbldat = tbldat.tolist() #so turn it back into a list
         tbldat.insert(0,['Rank','Title','Views']) #add column headers to the start
-        tbl = Table(tbldat)
+        tbl = Table(tbldat)"""
+        tbl = tbl_prep(topx,top_num)
         story.append(tbl)
         story.append(NextPageTemplate('BigPage'))
         story.append(PageBreak())
@@ -158,6 +160,20 @@ class AnalyticsReport(BaseDocTemplate):
             doc.page_height - 0.5 * cm, self.rpt_title)
 
         canvas.restoreState()
+
+def tbl_prep(topx,top_num):
+    ranks = [str(x+1) for x in range(top_num)]
+    titles = [re.split('  * ',topx[x])[0] for x in range(top_num)]
+    views = [re.split('  * ',topx[x])[1] for x in range(top_num)]
+
+    tbldat = [
+            ranks,titles,views
+            ]
+    tbldat = np.transpose(tbldat) #transpose turns tbldat list into a np.array
+    tbldat = tbldat.tolist() #so turn it back into a list
+    tbldat.insert(0,['Rank','Title','Views']) #add column headers to the start
+    tbl = Table(tbldat)
+    return tbl
 
 def pdf_report(pdf_name,input,drawing):
     doc = BaseDocTemplate(pdf_name, showBoundary=1, pagesize=letter)

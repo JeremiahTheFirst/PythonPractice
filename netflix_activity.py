@@ -83,7 +83,7 @@ def limited_analysis(limited_dataframe):
     return total_time_watched,mode_time_watched,\
         mean_time_watched,median_time_watched
 
-def top_x_analysis(expanded_dataframe,title_type,cnt,invert=False):
+def top_x_analysis(expanded_dataframe,title_type,cnt,invert=True):
     '''Identify the top 5 watched items from the analyzed file'''
     
     if not invert:
@@ -126,13 +126,13 @@ if __name__ == "__main__":
     limited_dataframe = analyze()
     expanded_dataframe = expand_dataframe(limited_dataframe)
     analysis = limited_analysis(expanded_dataframe)
-    top5 = top_x_analysis(expanded_dataframe,'EP_title',5,True)
-    top5tv = top_x_analysis(expanded_dataframe,'EP_name',5,True)
-    top5mov = top_x_analysis(expanded_dataframe,'EP_name',5) 
-    top5spec = top_x_analysis(expanded_dataframe,'SPEC_name',5,True)
+    topx = top_x_analysis(expanded_dataframe,'EP_title',5)
+    topxtv = top_x_analysis(expanded_dataframe,'EP_name',5)
+    topxmov = top_x_analysis(expanded_dataframe,'EP_name',5,False) 
+    topxspec = top_x_analysis(expanded_dataframe,'SPEC_name',5)
     pdf_txt = generate_report(analysis)
     graph_plots = graphs.graphnalysis(limited_dataframe,\
         'Anything Watched by Day (ex. Previews)')
     drawing=graphs.graph_result(graph_plots)
     reports.AnalyticsReport('NetflixActivityAnalysis.pdf',\
-        'Netflix Activity Analysis',pdf_txt,top5,drawing)
+        'Netflix Activity Analysis',pdf_txt,topx,drawing)
