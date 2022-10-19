@@ -91,7 +91,7 @@ class AnalyticsReport(BaseDocTemplate):
         t_style.fontName = 'Helvetica'
         b_style.fontName = 'Helvetica'
 
-        intro = Paragraph("From analyzing the provided data we can provide some facts.",
+        intro = Paragraph("From analyzing the provided data we have gleaned some facts.",
             style)
         totals = ListFlowable(
                     [
@@ -110,24 +110,14 @@ class AnalyticsReport(BaseDocTemplate):
         story.append(lnbr)
         story.append(totals)
         story.append(lnbr)
-        top_num = len(topx)
-        text = """Below, you can see the %s most watched items and the
-        number of views they received.""" % (top_num)
+        top_num = len(topx[0])
+        #text = """Below, you can see the %s most watched items and the
+        #number of views they received.""" % (top_num)
+        text = topx[1]
         para = Paragraph(text, style)
         story.append(para)
         story.append(lnbr)
-        """ranks = [str(x+1) for x in range(top_num)]
-        titles = [re.split('  * ',topx[x])[0] for x in range(top_num)]
-        views = [re.split('  * ',topx[x])[1] for x in range(top_num)]
-
-        tbldat = [
-                ranks,titles,views
-                ]
-        tbldat = np.transpose(tbldat) #transpose turns tbldat list into a np.array
-        tbldat = tbldat.tolist() #so turn it back into a list
-        tbldat.insert(0,['Rank','Title','Views']) #add column headers to the start
-        tbl = Table(tbldat)"""
-        tbl = tbl_prep(topx,top_num)
+        tbl = tbl_prep(topx[0],top_num)
         story.append(tbl)
         story.append(NextPageTemplate('BigPage'))
         story.append(PageBreak())
@@ -216,7 +206,7 @@ def pdf_report(pdf_name,input,drawing):
     b_style.fontName = 'Helvetica'
 
     title = Paragraph("Netflix Activity Analysis", t_style)
-    intro = Paragraph("From analyzing the provided data we can provide some facts.",
+    intro = Paragraph("From analyzing the provided data we have gleaned some facts.",
             style)
     totals = ListFlowable(
                 [

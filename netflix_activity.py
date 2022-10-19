@@ -83,7 +83,7 @@ def limited_analysis(limited_dataframe):
     return total_time_watched,mode_time_watched,\
         mean_time_watched,median_time_watched
 
-def top_x_analysis(expanded_dataframe,title_type,cnt,invert=True):
+def top_x_analysis(expanded_dataframe,title_type,content_type,cnt,invert=True):
     '''Identify the top 5 watched items from the analyzed file'''
     
     if not invert:
@@ -94,9 +94,11 @@ def top_x_analysis(expanded_dataframe,title_type,cnt,invert=True):
     num_x = top_x.count()
     top_x = top_x.to_string(name=False,dtype=False)
     top_x = top_x.split('\n')
+    content = "Here are the top %s %s you watched and the number of views for each"\
+        " item" % (num_x,content_type)
     """for x in range(num_x):
         print("%d. %s" % (x+1,top_x[x]))"""
-    return top_x
+    return top_x,content
 
 def graph_by_day(by_day_dataframe):
     '''Graph provided dataset by day and output to PDF'''
@@ -126,10 +128,10 @@ if __name__ == "__main__":
     limited_dataframe = analyze()
     expanded_dataframe = expand_dataframe(limited_dataframe)
     analysis = limited_analysis(expanded_dataframe)
-    topx = top_x_analysis(expanded_dataframe,'EP_title',5)
-    topxtv = top_x_analysis(expanded_dataframe,'EP_name',5)
-    topxmov = top_x_analysis(expanded_dataframe,'EP_name',5,False) 
-    topxspec = top_x_analysis(expanded_dataframe,'SPEC_name',5)
+    topx = top_x_analysis(expanded_dataframe,'EP_title',"things",5)
+    topxtv = top_x_analysis(expanded_dataframe,'EP_name',"TV shows",5)
+    topxmov = top_x_analysis(expanded_dataframe,'EP_name',"movies",5,False) 
+    topxspec = top_x_analysis(expanded_dataframe,'SPEC_name',"specials",5)
     pdf_txt = generate_report(analysis)
     graph_plots = graphs.graphnalysis(limited_dataframe,\
         'Anything Watched by Day (ex. Previews)')
