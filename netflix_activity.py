@@ -76,10 +76,10 @@ def limited_analysis(limited_dataframe):
     mode_time_watched = time_breakdown.split(mode_time_watched)
     mean_time_watched = time_breakdown.split(mean_time_watched)
     median_time_watched = time_breakdown.split(median_time_watched)
-    print ('The total time watched is: {}\nThe mode time watched is: \
+    """print ('The total time watched is: {}\nThe mode time watched is: \
         {}'.format(total_time_watched,mode_time_watched))
     print ('The mean time watched is: {}\nThe median time watched is: \
-        {}'.format(mean_time_watched,median_time_watched))
+        {}'.format(mean_time_watched,median_time_watched))"""
     return total_time_watched,mode_time_watched,\
         mean_time_watched,median_time_watched
 
@@ -94,8 +94,8 @@ def top_x_analysis(expanded_dataframe,title_type,cnt,invert=True):
     num_x = top_x.count()
     top_x = top_x.to_string(name=False,dtype=False)
     top_x = top_x.split('\n')
-    for x in range(num_x):
-        print("%d. %s" % (x+1,top_x[x]))
+    """for x in range(num_x):
+        print("%d. %s" % (x+1,top_x[x]))"""
     return top_x
 
 def graph_by_day(by_day_dataframe):
