@@ -33,7 +33,7 @@ def analyze(file='ViewingActivity.csv'):
     df['year'] = df['Start Time'].dt.year
     
     #Categorizing for proper ordering in charts
-    dotw=['Monday', 'Tuesday', 'Wednesday', 'Thursday', \
+    dotw = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', \
         'Friday', 'Saturday', 'Sunday']
     df['weekday'] = pd.Categorical(df['weekday'], categories=dotw, ordered=True)
 
@@ -132,6 +132,7 @@ if __name__ == "__main__":
     topxtv = top_x_analysis(expanded_dataframe,'EP_name',"TV shows",5)
     topxmov = top_x_analysis(expanded_dataframe,'EP_name',"movies",5,False) 
     topxspec = top_x_analysis(expanded_dataframe,'SPEC_name',"specials",5)
+    #Test for no specials, etc., also consider a limit on x
     pdf_txt = generate_report(analysis)
     graph_plots = graphs.graphnalysis(limited_dataframe,\
         'Anything Watched by Day (ex. Previews)')

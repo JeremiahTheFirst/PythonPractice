@@ -127,7 +127,6 @@ class AnalyticsReport(BaseDocTemplate):
         self.author='Jeremiah Adams'
         self.subject='Stats and graphs on the user\'s supplied Netflix activity'
         self.keywords='Netflix DataScience Statistics'
-
         self.build(story,canvasmaker=NumberedCanvas)
 
     def on_first_page(self, canvas, doc):
