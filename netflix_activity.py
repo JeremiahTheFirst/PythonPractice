@@ -94,10 +94,15 @@ def top_x_analysis(expanded_dataframe,title_type,content_type,cnt,invert=True):
     num_x = top_x.count()
     top_x = top_x.to_string(name=False,dtype=False)
     top_x = top_x.split('\n')
-    content = "Here are the top %s %s you watched and the number of views for each"\
-        " item" % (num_x,content_type)
-    """for x in range(num_x):
-        print("%d. %s" % (x+1,top_x[x]))"""
+    if num_x == 1:
+        content_type = content_type[:-1]
+        content = "Here is the top %s you watched and the number of times you watched"\
+            " it" % (content_type)
+    else:
+        content = "Here are the top %s %s you watched and the number of views for each"\
+            " item" % (num_x,content_type)
+        """for x in range(num_x):
+            print("%d. %s" % (x+1,top_x[x]))"""
     return top_x,content
 
 def graph_by_day(by_day_dataframe):
@@ -138,4 +143,4 @@ if __name__ == "__main__":
         'Anything Watched by Day (ex. Previews)')
     drawing=graphs.graph_result(graph_plots)
     reports.AnalyticsReport('NetflixActivityAnalysis.pdf',\
-        'Netflix Activity Analysis',pdf_txt,topx,drawing)
+        'Netflix Activity Analysis',pdf_txt,drawing,topx,topxtv,topxmov,topxspec)

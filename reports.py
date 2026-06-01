@@ -52,10 +52,16 @@ class NumberedCanvas(canvas.Canvas):
 
 class AnalyticsReport(BaseDocTemplate):
     '''With great assistance from https://stackoverflow.com/a/39268987'''
-    def __init__(self, filename, rpt_title, input, topx, drawing, **kwargs):
+    def __init__(self, filename, rpt_title, input, drawing, *args, **kwargs):
         super().__init__(filename, page_size=A4, _pageBreakQuick=0, **kwargs)
         self.rpt_title = rpt_title
         self.input = input
+        countTop = len(args)
+        if not countTop > 0:     
+            overallTop = "No data available"
+        else:
+            # Set four variables to first four of args, or None if args is finished/empty
+            overallTop,tvTop,movTop,specTop = (args + (None,) * 4)[:4]
 
         self.page_width = (self.width + self.leftMargin * 2)
         self.page_height = (self.height + self.bottomMargin * 2)
@@ -110,15 +116,12 @@ class AnalyticsReport(BaseDocTemplate):
         story.append(lnbr)
         story.append(totals)
         story.append(lnbr)
-        top_num = len(topx[0])
         #text = """Below, you can see the %s most watched items and the
         #number of views they received.""" % (top_num)
-        text = topx[1]
-        para = Paragraph(text, style)
-        story.append(para)
-        story.append(lnbr)
-        tbl = tbl_prep(topx[0],top_num)
-        story.append(tbl)
+        story.append(story_builder(story,style,overallTop))
+        story.append(story_builder(story,style,tvTop))
+        story.append(story_builder(story,style,movTop))
+        story.append(story_builder(story,style,specTop,True))
         story.append(NextPageTemplate('BigPage'))
         story.append(PageBreak())
         story.append(drawing)
@@ -150,16 +153,35 @@ class AnalyticsReport(BaseDocTemplate):
 
         canvas.restoreState()
 
-def tbl_prep(topx,top_num):
+def tbl_prep(topItem,top_num):
     ranks = [str(x+1) for x in range(top_num)]
-    titles = [re.split('  * ',topx[x])[0] for x in range(top_num)]
-    views = [re.split('  * ',topx[x])[1] for x in range(top_num)]
-
+    titles = [re.split('  * ',topItem[x])[0] for x in range(top_num)]
+    views = [re.split('  * ',topItem[x])[1] for x in range(top_num)]
+    #t = Table(data, colWidths=[100, 100], rowHeights=row_heights)
     tbldat = [
             ranks,titles,views
             ]
     tbldat = np.transpose(tbldat) #transpose turns tbldat list into a np.array
     tbldat = tbldat.tolist() #so turn it back into a list
     tbldat.insert(0,['Rank','Title','Views']) #add column headers to the start
-    tbl = Table(tbldat)
+    tbl = Table(tbldat, colWidths=[None,150,None])
+    tbl.setStyle(TableStyle([
+        ('LINEBELOW',(0,0),(-1,0),0.25,colors.black),
+        ('NOSPLIT',(0,0),(-1,-1))
+        ]))
     return tbl
+
+def story_builder(story,style,topPiece,skip=False):
+    '''As long as topPiece is passed, add it to the story in this way'''
+    if not topPiece is None:
+        story = story
+        lnbr = Spacer(1,0.25*inch)
+        top_num = len(topPiece[0])
+        text = topPiece[1]
+        para = Paragraph(text, style)
+        story.append(para)
+        story.append(lnbr)
+        tbl = tbl_prep(topPiece[0],top_num)
+        story.append(tbl)
+        if not skip == True:
+            story.append(lnbr)
