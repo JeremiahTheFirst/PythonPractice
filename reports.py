@@ -118,10 +118,7 @@ class AnalyticsReport(BaseDocTemplate):
         story.append(lnbr)
         #text = """Below, you can see the %s most watched items and the
         #number of views they received.""" % (top_num)
-        story.append(story_builder(story,style,overallTop))
-        story.append(story_builder(story,style,tvTop))
-        story.append(story_builder(story,style,movTop))
-        story.append(story_builder(story,style,specTop,True))
+        story.append(story_builder(story,style,overallTop,tvTop,movTop,specTop))
         story.append(NextPageTemplate('BigPage'))
         story.append(PageBreak())
         story.append(drawing)
@@ -171,17 +168,20 @@ def tbl_prep(topItem,top_num):
         ]))
     return tbl
 
-def story_builder(story,style,topPiece,skip=False):
+def story_builder(story,style,top1,top2,top3,top4):
     '''As long as topPiece is passed, add it to the story in this way'''
-    if not topPiece is None:
-        story = story
-        lnbr = Spacer(1,0.25*inch)
-        top_num = len(topPiece[0])
-        text = topPiece[1]
-        para = Paragraph(text, style)
-        story.append(para)
-        story.append(lnbr)
-        tbl = tbl_prep(topPiece[0],top_num)
-        story.append(tbl)
-        if not skip == True:
+    has_added = False
+    for top in (top1,top2,top3,top4):
+        if not top is None:
+            if has_added:
+                    story.append(lnbr)
+            story = story
+            lnbr = Spacer(1,0.25*inch)
+            top_num = len(top[0])
+            text = top[1]
+            para = Paragraph(text, style)
+            story.append(para)
             story.append(lnbr)
+            tbl = tbl_prep(top[0],top_num)
+            story.append(tbl)
+            has_added = True
