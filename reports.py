@@ -163,7 +163,15 @@ def tbl_prep(topItem,top_num):
     tbldat.insert(0,['Rank','Title','Views']) #add column headers to the start
     tbl = Table(tbldat, colWidths=[None,150,None])
     tbl.setStyle(TableStyle([
+        #Outer grid
+        ('LINEABOVE',(0,0),(-1,0),0.25,colors.black),
         ('LINEBELOW',(0,0),(-1,0),0.25,colors.black),
+        ('LINEBEFORE',(0,0),(0,-1),0.25,colors.black),
+        ('LINEAFTER',(0,0),(0,-1),0.25,colors.black),
+        ('LINEBELOW',(0,-1),(-1,-1),0.25,colors.black),
+        ('LINEAFTER',(-1,0),(-1,-1),0.25,colors.black),
+        ('LINEAFTER',(-2,0),(-2,-1),0.25,colors.black),
+        #Keep it together on the page
         ('NOSPLIT',(0,0),(-1,-1))
         ]))
     return tbl
