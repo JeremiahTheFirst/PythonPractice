@@ -87,23 +87,46 @@ def top_x_analysis(expanded_dataframe,title_type,content_type,cnt,invert=True):
     '''Identify the top 5 watched items from the analyzed file'''
     
     if not invert:
-        top_x = expanded_dataframe[expanded_dataframe[title_type].isnull()]
+        no_nulls = expanded_dataframe[expanded_dataframe[title_type].isnull()]
+        no_nulls = no_nulls[no_nulls['EP_title'] != 'Unknown Title']
+        #Just for mov: top_x["EP_title"].mask(lambda x: x.eq("Unknown Title")).value_counts().nlargest(cnt) - clunky
     else:
-        top_x = expanded_dataframe[~expanded_dataframe[title_type].isnull()]
-    top_x = top_x['EP_title'].value_counts().nlargest(cnt)
+        no_nulls = expanded_dataframe[~expanded_dataframe[title_type].isnull()]
+    top_x = no_nulls['EP_title'].value_counts().nlargest(cnt)
+    topCnt = top_x.index
     num_x = top_x.count()
     top_x = top_x.to_string(name=False,dtype=False)
     top_x = top_x.split('\n')
+    # Filter only rows with top 5 values
+    mask = no_nulls['EP_title'].isin(topCnt)
+
+    # Groupby name and title and count occurrences
+    counts = (no_nulls[mask].groupby(['EP_title', 'EP_name']).size().reset_index(name='count'))
+    # Combine title and name for labeling. For each title, get the name with the highest count
+    counts['EP_combined'] = counts['EP_title'] + ' - ' + counts['EP_name']
+    top_per_title = (counts.sort_values(['EP_title', 'count'], ascending=[True, False])
+        .drop_duplicates(subset='EP_title', keep='first').set_index('EP_combined')['count'])
+    top_per_title = top_per_title.to_string(name=False,dtype=False,header=False)
+    top_per_title = top_per_title.split('\n')
+    #print(top_per_title)
     if num_x == 1:
         content_type = content_type[:-1]
         content = "Here is the top %s you watched and the number of times you watched"\
             " it" % (content_type)
+        ep_content = "Here is the most watched episode for the top %s you watched and"\
+            " the number of times you watched it" % (content_type)
     else:
         content = "Here are the top %s %s you watched and the number of views for each"\
             " item" % (num_x,content_type)
         """for x in range(num_x):
             print("%d. %s" % (x+1,top_x[x]))"""
-    return top_x,content
+        if content_type == 'TV shows':
+            ep_content = "Here are the most watched episodes for your top %s %s and the"\
+            " number of views for each %s" % (num_x,content_type,content_type[:-1])
+    result = top_x,content
+    if content_type == 'TV shows':
+        result = result + (top_per_title,ep_content)
+    return result
 
 def graph_by_day(by_day_dataframe):
     '''Graph provided dataset by day and output to PDF'''
@@ -137,10 +160,12 @@ if __name__ == "__main__":
     topxtv = top_x_analysis(expanded_dataframe,'EP_name',"TV shows",5)
     topxmov = top_x_analysis(expanded_dataframe,'EP_name',"movies",5,False) 
     topxspec = top_x_analysis(expanded_dataframe,'SPEC_name',"specials",5)
+    topxep = topxtv[2],topxtv[3]
+    topxtv = topxtv[0],topxtv[1]
     #Test for no specials, etc., also consider a limit on x
     pdf_txt = generate_report(analysis)
     graph_plots = graphs.graphnalysis(limited_dataframe,\
         'Anything Watched by Day (ex. Previews)')
     drawing=graphs.graph_result(graph_plots)
     reports.AnalyticsReport('NetflixActivityAnalysis.pdf',\
-        'Netflix Activity Analysis',pdf_txt,drawing,topx,topxtv,topxmov,topxspec)
+        'Netflix Activity Analysis',pdf_txt,drawing,topx,topxtv,topxep,topxmov,topxspec)

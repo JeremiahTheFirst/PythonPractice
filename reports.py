@@ -61,7 +61,7 @@ class AnalyticsReport(BaseDocTemplate):
             overallTop = "No data available"
         else:
             # Set four variables to first four of args, or None if args is finished/empty
-            overallTop,tvTop,movTop,specTop = (args + (None,) * 4)[:4]
+            overallTop,tvTop,epTop,movTop,specTop = (args + (None,) * 5)[:5]
 
         self.page_width = (self.width + self.leftMargin * 2)
         self.page_height = (self.height + self.bottomMargin * 2)
@@ -118,7 +118,7 @@ class AnalyticsReport(BaseDocTemplate):
         story.append(lnbr)
         #text = """Below, you can see the %s most watched items and the
         #number of views they received.""" % (top_num)
-        story.append(story_builder(story,style,overallTop,tvTop,movTop,specTop))
+        story.append(story_builder(story,style,overallTop,tvTop,epTop,movTop,specTop))
         story.append(NextPageTemplate('BigPage'))
         story.append(PageBreak())
         story.append(drawing)
@@ -153,6 +153,7 @@ class AnalyticsReport(BaseDocTemplate):
 def tbl_prep(topItem,top_num):
     ranks = [str(x+1) for x in range(top_num)]
     titles = [re.split('  * ',topItem[x])[0] for x in range(top_num)]
+    print(titles)
     views = [re.split('  * ',topItem[x])[1] for x in range(top_num)]
     #t = Table(data, colWidths=[100, 100], rowHeights=row_heights)
     tbldat = [
@@ -176,10 +177,10 @@ def tbl_prep(topItem,top_num):
         ]))
     return tbl
 
-def story_builder(story,style,top1,top2,top3,top4):
+def story_builder(story,style,top1,top2,top3,top4,top5):
     '''As long as topPiece is passed, add it to the story in this way'''
     has_added = False
-    for top in (top1,top2,top3,top4):
+    for top in (top1,top2,top3,top4,top5):
         if not top is None:
             if has_added:
                     story.append(lnbr)
