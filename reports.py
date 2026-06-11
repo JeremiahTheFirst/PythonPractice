@@ -17,7 +17,8 @@ from reportlab.platypus import (
     SimpleDocTemplate,
     Spacer,
     Table,
-    TableStyle
+    TableStyle,
+    KeepTogether
 )
 
 class NumberedCanvas(canvas.Canvas):
@@ -200,8 +201,10 @@ def story_builder(story,style,top1,top2,top3,top4,top5):
             top_num = len(top[0])
             text = top[1]
             para = Paragraph(text, style)
-            story.append(para)
-            story.append(lnbr)
+            #story.append(para)
+            #story.append(lnbr)
             tbl = tbl_prep(top[0],top_num)
-            story.append(tbl)
+            group = KeepTogether([para,lnbr,tbl])
+            story.append(group)
+            #story.append(tbl)
             has_added = True
