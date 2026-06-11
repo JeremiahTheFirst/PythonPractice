@@ -153,7 +153,16 @@ class AnalyticsReport(BaseDocTemplate):
 def tbl_prep(topItem,top_num):
     ranks = [str(x+1) for x in range(top_num)]
     titles = [re.split('  * ',topItem[x])[0] for x in range(top_num)]
-    print(titles)
+    for x in range(top_num):
+        pos = titles[x].find('-')
+        if pos != -1:
+            showName = titles[x][:pos]
+            episodeName = titles[x][pos:]
+            if len(episodeName) > 33:
+                episodeName = episodeName[:33] + '\n' + episodeName[33:]
+            titles[x] = showName + '\n' + episodeName
+        elif len(titles[x]) > 30:
+            titles[x] = titles[x][:30] + '\n' + titles[x][30:]
     views = [re.split('  * ',topItem[x])[1] for x in range(top_num)]
     #t = Table(data, colWidths=[100, 100], rowHeights=row_heights)
     tbldat = [
@@ -164,7 +173,7 @@ def tbl_prep(topItem,top_num):
     tbldat.insert(0,['Rank','Title','Views']) #add column headers to the start
     tbl = Table(tbldat, colWidths=[None,150,None])
     tbl.setStyle(TableStyle([
-        #Outer grid
+        # Outer grid
         ('LINEABOVE',(0,0),(-1,0),0.25,colors.black),
         ('LINEBELOW',(0,0),(-1,0),0.25,colors.black),
         ('LINEBEFORE',(0,0),(0,-1),0.25,colors.black),
@@ -172,8 +181,10 @@ def tbl_prep(topItem,top_num):
         ('LINEBELOW',(0,-1),(-1,-1),0.25,colors.black),
         ('LINEAFTER',(-1,0),(-1,-1),0.25,colors.black),
         ('LINEAFTER',(-2,0),(-2,-1),0.25,colors.black),
-        #Keep it together on the page
-        ('NOSPLIT',(0,0),(-1,-1))
+        # Keep it together on the page
+        ('NOSPLIT',(0,0),(-1,-1)),
+        # Needed due to splitting long Titles
+        ('VALIGN',(0,0),(-1,-1),'TOP')
         ]))
     return tbl
 
