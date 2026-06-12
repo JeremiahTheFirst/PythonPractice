@@ -151,12 +151,13 @@ class AnalyticsReport(BaseDocTemplate):
 
         canvas.restoreState()
 
-def tbl_prep(topItem,top_num):
+def tbl_prep(topItem,top_num,itemContext):
     ranks = [str(x+1) for x in range(top_num)]
     titles = [re.split('  * ',topItem[x])[0] for x in range(top_num)]
+    is_tv = re.search('most watched episodes*',itemContext)
     for x in range(top_num):
         pos = titles[x].find('-')
-        if pos != -1:
+        if pos != -1 and is_tv:
             showName = titles[x][:pos]
             episodeName = titles[x][pos:]
             if len(episodeName) > 33:
@@ -194,6 +195,7 @@ def story_builder(story,style,top1,top2,top3,top4,top5):
     has_added = False
     for top in (top1,top2,top3,top4,top5):
         if not top is None:
+            # has_added to prevent trailing lnbr
             if has_added:
                     story.append(lnbr)
             story = story
@@ -201,10 +203,7 @@ def story_builder(story,style,top1,top2,top3,top4,top5):
             top_num = len(top[0])
             text = top[1]
             para = Paragraph(text, style)
-            #story.append(para)
-            #story.append(lnbr)
-            tbl = tbl_prep(top[0],top_num)
+            tbl = tbl_prep(top[0],top_num,top[1])
             group = KeepTogether([para,lnbr,tbl])
             story.append(group)
-            #story.append(tbl)
             has_added = True
