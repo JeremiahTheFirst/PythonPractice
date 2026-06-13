@@ -185,8 +185,15 @@ def tbl_prep(topItem,top_num,itemContext):
         ('LINEAFTER',(-2,0),(-2,-1),0.25,colors.black),
         # Keep it together on the page
         ('NOSPLIT',(0,0),(-1,-1)),
+        # Aligning rank and views columns
+        ('ALIGN',(0,1),(0,-1),'CENTER'),
+        ('ALIGN',(-1,1),(-1,-1),'RIGHT'),
         # Needed due to splitting long Titles
-        ('VALIGN',(0,0),(-1,-1),'TOP')
+        ('VALIGN',(0,0),(-1,-1),'TOP'),
+        ('TEXTCOLOR',(0,0),(-1,0),colors.whitesmoke),
+        ('FONTNAME',(0,0),(-1,0),'Helvetica-Bold'),
+        ('BACKGROUND',(0,0),(-1,0),colors.HexColor('#E50914')),
+        ('ROWBACKGROUNDS',(0,1),(-1,-1),[colors.HexColor('#E7E7E7'),colors.HexColor('#EEEEEE')])
         ]))
     return tbl
 
