@@ -62,7 +62,7 @@ class AnalyticsReport(BaseDocTemplate):
             overallTop = "No data available"
         else:
             # Set four variables to first four of args, or None if args is finished/empty
-            overallTop,tvTop,epTop,movTop,specTop = (args + (None,) * 5)[:5]
+            overallTop,tvTop,epTop,indEpTop,movTop,specTop = (args + (None,) * 6)[:6]
 
         self.page_width = (self.width + self.leftMargin * 2)
         self.page_height = (self.height + self.bottomMargin * 2)
@@ -119,7 +119,7 @@ class AnalyticsReport(BaseDocTemplate):
         story.append(lnbr)
         #text = """Below, you can see the %s most watched items and the
         #number of views they received.""" % (top_num)
-        story.append(story_builder(story,style,overallTop,tvTop,epTop,movTop,specTop))
+        story.append(story_builder(story,style,overallTop,tvTop,epTop,indEpTop,movTop,specTop))
         story.append(NextPageTemplate('BigPage'))
         story.append(PageBreak())
         story.append(drawing)
@@ -157,6 +157,7 @@ def tbl_prep(topItem,top_num,itemContext):
     is_tv = re.search('most watched episodes*',itemContext)
     for x in range(top_num):
         pos = titles[x].find('-')
+        #Conditionally add columns may be better
         if pos != -1 and is_tv:
             showName = titles[x][:pos]
             episodeName = titles[x][pos:]
@@ -197,10 +198,10 @@ def tbl_prep(topItem,top_num,itemContext):
         ]))
     return tbl
 
-def story_builder(story,style,top1,top2,top3,top4,top5):
+def story_builder(story,style,top1,top2,top3,top4,top5,top6):
     '''As long as topPiece is passed, add it to the story in this way'''
     has_added = False
-    for top in (top1,top2,top3,top4,top5):
+    for top in (top1,top2,top3,top4,top5,top6):
         if not top is None:
             # has_added to prevent trailing lnbr
             if has_added:
