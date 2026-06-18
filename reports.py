@@ -154,7 +154,7 @@ class AnalyticsReport(BaseDocTemplate):
 def tbl_prep(topItem,top_num,itemContext):
     ranks = [str(x+1) for x in range(top_num)]
     titles = [re.split('  * ',topItem[x])[0] for x in range(top_num)]
-    is_tv = re.search('most watched episodes*',itemContext)
+    is_tv = re.search('(most watched|tv show) episodes*',itemContext)
     for x in range(top_num):
         pos = titles[x].find('-')
         #Conditionally add columns may be better
@@ -168,12 +168,15 @@ def tbl_prep(topItem,top_num,itemContext):
             titles[x] = titles[x][:30] + '\n' + titles[x][30:]
     views = [re.split('  * ',topItem[x])[1] for x in range(top_num)]
     #t = Table(data, colWidths=[100, 100], rowHeights=row_heights)
+    '''Somewhere before here, need a var or something to dictate number of columns
+    and then conditionally add to tblhead and tbldat'''
     tbldat = [
             ranks,titles,views
             ]
     tbldat = np.transpose(tbldat) #transpose turns tbldat list into a np.array
     tbldat = tbldat.tolist() #so turn it back into a list
-    tbldat.insert(0,['Rank','Title','Views']) #add column headers to the start
+    tblhead = ['Rank','Title','Views']
+    tbldat.insert(0,tblhead) #add column headers to the start
     tbl = Table(tbldat, colWidths=[None,150,None])
     tbl.setStyle(TableStyle([
         # Outer grid

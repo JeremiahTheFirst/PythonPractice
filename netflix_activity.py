@@ -133,8 +133,8 @@ def top_x_analysis(expanded_dataframe,title_type,content_type,cnt,invert=True):
         if content_type == 'TV shows':
             ep_content = "Here are the most watched episodes for your top %s %s and the"\
             " number of views for each episode" % (num_x,content_type)
-            untethered_ep_content = "Here are the top %s %s episodes youu watched,"\
-            " irrespective of the main show and the number of views for each episode" % (num_x,content_type)
+            untethered_ep_content = "Here are the top %s %s episodes you watched,"\
+            " irrespective of the main show, and the number of views for each episode" % (num_x,content_type[:1])
     result = top_x,content
     if content_type == 'TV shows':
         result = result + (top_per_title,ep_content,top_episodes,untethered_ep_content)
