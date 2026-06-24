@@ -134,7 +134,7 @@ def top_x_analysis(expanded_dataframe,title_type,content_type,cnt,invert=True):
             ep_content = "Here are the most watched episodes for your top %s %s and the"\
             " number of views for each episode" % (num_x,content_type)
             untethered_ep_content = "Here are the top %s %s episodes you watched,"\
-            " irrespective of the main show, and the number of views for each episode" % (num_x,content_type[:1])
+            " irrespective of the main show, and the number of views for each episode" % (num_x,content_type[:-1])
     result = top_x,content
     if content_type == 'TV shows':
         result = result + (top_per_title,ep_content,top_episodes,untethered_ep_content)
@@ -175,10 +175,11 @@ if __name__ == "__main__":
     topxep = topxtv[2],topxtv[3]
     topxiep = topxtv[4],topxtv[5]
     topxtv = topxtv[0],topxtv[1]
+    vars = [topx,topxtv,topxep,topxiep,topxmov,topxspec]
     #Test for no specials, etc., also consider a limit on x
     pdf_txt = generate_report(analysis)
     graph_plots = graphs.graphnalysis(limited_dataframe,\
         'Anything Watched by Day (ex. Previews)')
     drawing = graphs.graph_result(graph_plots)
     reports.AnalyticsReport('NetflixActivityAnalysis.pdf',\
-        'Netflix Activity Analysis',pdf_txt,drawing,topx,topxtv,topxep,topxiep,topxmov,topxspec)
+        'Netflix Activity Analysis',pdf_txt,drawing,vars)

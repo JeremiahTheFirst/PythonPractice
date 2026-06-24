@@ -62,7 +62,9 @@ class AnalyticsReport(BaseDocTemplate):
             overallTop = "No data available"
         else:
             # Set four variables to first four of args, or None if args is finished/empty
-            overallTop,tvTop,epTop,indEpTop,movTop,specTop = (args + (None,) * 6)[:6]
+            #overallTop,tvTop,epTop,indEpTop,movTop,specTop = (args + (None,) * 6)[:6]
+            overallTop,tvTop,epTop,indEpTop,movTop,specTop = args[0]
+            
 
         self.page_width = (self.width + self.leftMargin * 2)
         self.page_height = (self.height + self.bottomMargin * 2)
