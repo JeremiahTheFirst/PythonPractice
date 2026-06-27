@@ -106,17 +106,25 @@ def top_x_analysis(expanded_dataframe,title_type,content_type,cnt,invert=True):
     mask = no_nulls['EP_title'].isin(topCnt)
 
     # Groupby name and title and count occurrences
-    counts = (no_nulls[mask].groupby(['EP_title', 'EP_name','EP_combined']).size().reset_index(name='count'))
+    counts = (no_nulls[mask].groupby(['EP_title', 'EP_name', 'EP_combined']).size().reset_index(name='count'))
     # Combine title and name for labeling. For each title, get the name with the highest count
     #counts['EP_combined'] = counts['EP_title'] + ' - ' + counts['EP_name']
+    #[['EP_name','count']] - this at the end of top_per_title opens it to showing three columns
+    '''top_per_title = (counts.sort_values(['EP_title', 'count'], ascending=[True, False])
+        .drop_duplicates(subset='EP_title', keep='first').set_index('EP_combined')['count'])'''
     top_per_title = (counts.sort_values(['EP_title', 'count'], ascending=[True, False])
-        .drop_duplicates(subset='EP_title', keep='first').set_index('EP_combined')['count'])
-    top_per_title = top_per_title.to_string(name=False,dtype=False,header=False)
+        .drop_duplicates(subset='EP_title', keep='first').set_index('EP_combined')[['EP_title', 'EP_name', 'count']])
+    top_per_title.index = top_per_title['EP_title']
+    top_per_title = top_per_title.drop(columns=['EP_title'])
+    top_per_title.index.name = None
+    top_per_title = top_per_title.to_string(header=False)
     top_per_title = top_per_title.split('\n')
-    top_episodes = no_nulls['EP_context'].value_counts().nlargest(cnt)
-    top_episodes = top_episodes.to_string(name=False,dtype=False)
+    #Still need EP_combined to identify top_episodes, but can just display it better to get season and show info
+    top_episodes = no_nulls[['EP_combined', 'EP_name', 'EP_title', 'EP_season']].value_counts().nlargest(cnt)
+    top_episodes = top_episodes.reset_index(level = ['EP_combined'], drop=True)
+    top_episodes = top_episodes.to_string(name=False,dtype=False,header=False)
     top_episodes = top_episodes.split('\n')
-    #print(top_per_title)
+    #pd.set_option('display.multi-sparse', False)
     if num_x == 1:
         content_type = content_type[:-1]
         content = "Here is the top %s you watched and the number of times you watched"\
