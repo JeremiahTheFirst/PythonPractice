@@ -162,49 +162,7 @@ def tbl_prep(topItem,top_num,itemContext):
             ]
     tblhead = ['Rank','Title','Views']
     columnWidths = [None,150,None]
-    is_tv = re.search('(most watched|TV show) episodes*',itemContext)
-    seasonMark = [re.search('Season \d+',topItem[x]) for x in range(top_num)]
-    individualized = False
-    if any(item is not None for item in seasonMark):
-        individualized = True
-    if is_tv:
-        if individualized == True:
-            episodes = [re.split('  * ',topItem[x])[0] for x in range(top_num)]
-            titles = [re.split('  * ',topItem[x])[1] for x in range(top_num)]
-            seasons = [re.split('  * ',topItem[x])[2] for x in range(top_num)]
-            views = [re.split('  * ',topItem[x])[3] for x in range(top_num)]
-            tbldat = [
-                    ranks,episodes,titles,seasons,views
-                    ]
-            tblhead = ['Rank','Episode','Title','Season','Views']
-            columnWidths = [None,150,150,None,None]
-        else:
-            episodes = [re.split('  * ',topItem[x])[1] for x in range(top_num)]
-            views = [re.split('  * ',topItem[x])[2] for x in range(top_num)]
-            tbldat = [
-                    ranks,titles,episodes,views
-                    ]
-            tblhead = ['Rank','Title','Episode','Views']
-            columnWidths = [None,150,150,None]
-    """ for x in range(top_num):
-        pos = titles[x].find('-')
-        #Conditionally add columns may be better
-        if pos != -1 and is_tv:
-            showName = titles[x][:pos]
-            episodeName = titles[x][pos:]
-            if len(episodeName) > 33:
-                episodeName = episodeName[:33] + '\n' + episodeName[33:]
-            titles[x] = showName + '\n' + episodeName
-        elif len(titles[x]) > 30:
-            titles[x] = titles[x][:30] + '\n' + titles[x][30:] """
-    #t = Table(data, colWidths=[100, 100], rowHeights=row_heights)
-    '''Somewhere before here, need a var or something to dictate number of columns
-    and then conditionally add to tblhead and tbldat'''
-    tbldat = np.transpose(tbldat) #transpose turns tbldat list into a np.array
-    tbldat = tbldat.tolist() #so turn it back into a list
-    tbldat.insert(0,tblhead) #add column headers to the start
-    tbl = Table(tbldat, colWidths=columnWidths)
-    tbl.setStyle(TableStyle([
+    styleCommands = [
         # Outer grid
         ('LINEABOVE',(0,0),(-1,0),0.25,colors.black),
         ('LINEBELOW',(0,0),(-1,0),0.25,colors.black),
@@ -224,7 +182,57 @@ def tbl_prep(topItem,top_num,itemContext):
         ('FONTNAME',(0,0),(-1,0),'Helvetica-Bold'),
         ('BACKGROUND',(0,0),(-1,0),colors.HexColor('#E50914')),
         ('ROWBACKGROUNDS',(0,1),(-1,-1),[colors.HexColor('#E7E7E7'),colors.HexColor('#EEEEEE')])
-        ]))
+    ]
+    is_tv = re.search('(most watched|TV show) episodes*',itemContext)
+    seasonMark = [re.search('Season \d+',topItem[x]) for x in range(top_num)]
+    individualized = False
+    if any(item is not None for item in seasonMark):
+        individualized = True
+    if is_tv:
+        if individualized == True:
+            episodes = [re.split('  * ',topItem[x])[0] for x in range(top_num)]
+            titles = [re.split('  * ',topItem[x])[1] for x in range(top_num)]
+            seasons = [re.split('  * ',topItem[x])[2] for x in range(top_num)]
+            views = [re.split('  * ',topItem[x])[3] for x in range(top_num)]
+            tbldat = [
+                    ranks,episodes,titles,seasons,views
+                    ]
+            tblhead = ['Rank','Episode','Title','Season','Views']
+            columnWidths = [None,150,150,None,None]
+            styleCommands.extend([
+                ('LINEAFTER',(1,0),(1,-1),0.25,colors.black),
+                ('LINEAFTER',(2,0),(2,-1),0.25,colors.black),
+            ])
+        else:
+            episodes = [re.split('  * ',topItem[x])[1] for x in range(top_num)]
+            views = [re.split('  * ',topItem[x])[2] for x in range(top_num)]
+            tbldat = [
+                    ranks,titles,episodes,views
+                    ]
+            tblhead = ['Rank','Title','Episode','Views']
+            columnWidths = [None,150,150,None]
+            styleCommands.append(
+                ('LINEAFTER',(1,0),(1,-1),0.25,colors.black)
+            )
+    """ for x in range(top_num):
+        pos = titles[x].find('-')
+        #Conditionally add columns may be better
+        if pos != -1 and is_tv:
+            showName = titles[x][:pos]
+            episodeName = titles[x][pos:]
+            if len(episodeName) > 33:
+                episodeName = episodeName[:33] + '\n' + episodeName[33:]
+            titles[x] = showName + '\n' + episodeName
+        elif len(titles[x]) > 30:
+            titles[x] = titles[x][:30] + '\n' + titles[x][30:] """
+    #t = Table(data, colWidths=[100, 100], rowHeights=row_heights)
+    '''Somewhere before here, need a var or something to dictate number of columns
+    and then conditionally add to tblhead and tbldat'''
+    tbldat = np.transpose(tbldat) #transpose turns tbldat list into a np.array
+    tbldat = tbldat.tolist() #so turn it back into a list
+    tbldat.insert(0,tblhead) #add column headers to the start
+    tbl = Table(tbldat, colWidths=columnWidths)
+    tbl.setStyle(TableStyle(styleCommands))
     return tbl
 
 def story_builder(story,style,top1,top2,top3,top4,top5,top6):
