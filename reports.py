@@ -1,4 +1,5 @@
 import re
+import textwrap
 from turtle import title
 import numpy as np
 from reportlab.lib.pagesizes import A4,letter
@@ -157,6 +158,7 @@ def tbl_prep(topItem,top_num,itemContext):
     ranks = [str(x+1) for x in range(top_num)]
     titles = [re.split('  * ',topItem[x])[0] for x in range(top_num)]
     views = [re.split('  * ',topItem[x])[1] for x in range(top_num)]
+    episodes = []
     tbldat = [
             ranks,titles,views
             ]
@@ -228,6 +230,11 @@ def tbl_prep(topItem,top_num,itemContext):
     #t = Table(data, colWidths=[100, 100], rowHeights=row_heights)
     '''Somewhere before here, need a var or something to dictate number of columns
     and then conditionally add to tblhead and tbldat'''
+    for list in titles,episodes:
+        for x in range(len(list)):
+            list[x] = textwrap.fill(list[x], width=30)
+            '''if len(list[x]) > 30:
+                list[x] = list[x][:30] + '\n' + list[x][30:]'''
     tbldat = np.transpose(tbldat) #transpose turns tbldat list into a np.array
     tbldat = tbldat.tolist() #so turn it back into a list
     tbldat.insert(0,tblhead) #add column headers to the start
